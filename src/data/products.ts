@@ -1,4 +1,3 @@
-
 export interface Product {
   id: number;
   name: string;
@@ -25,9 +24,9 @@ const products: Product[] = [
     category: 'Photo Albums',
     gender: 'Unisex',
     images: [
-      'https://images.unsplash.com/photo-1618160702438-9b02ab6515c9',
-      '/lovable-uploads/58947f85-2fe2-4022-b5d1-fed10a0ec647.png',
-      '/lovable-uploads/312bb6b3-7e31-43de-8d88-907b1647f6c9.png'
+      'https://images.unsplash.com/photo-1649972904349-6e44c42644a7',
+      'https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d',
+      'https://images.unsplash.com/photo-1518770660439-4636190af475'
     ],
     isNewArrival: true,
     inStock: true,
@@ -43,8 +42,8 @@ const products: Product[] = [
     category: 'Photo Albums',
     gender: 'Unisex',
     images: [
-      'https://images.unsplash.com/photo-1618160702438-9b02ab6515c9',
-      '/lovable-uploads/58947f85-2fe2-4022-b5d1-fed10a0ec647.png'
+      'https://images.unsplash.com/photo-1649972904349-6e44c42644a7',
+      'https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d'
     ],
     inStock: true,
     rating: 4.9,
@@ -58,8 +57,8 @@ const products: Product[] = [
     category: 'Baby Memory Boxes',
     gender: 'Boy',
     images: [
-      '/lovable-uploads/312bb6b3-7e31-43de-8d88-907b1647f6c9.png',
-      'https://images.unsplash.com/photo-1618160702438-9b02ab6515c9'
+      'https://images.unsplash.com/photo-1518770660439-4636190af475',
+      'https://images.unsplash.com/photo-1488590528505-98d2b5aba04b'
     ],
     inStock: true,
     rating: 4.7,
@@ -74,8 +73,8 @@ const products: Product[] = [
     category: 'Baby Memory Boxes',
     gender: 'Girl',
     images: [
-      '/lovable-uploads/312bb6b3-7e31-43de-8d88-907b1647f6c9.png',
-      'https://images.unsplash.com/photo-1618160702438-9b02ab6515c9'
+      'https://images.unsplash.com/photo-1518770660439-4636190af475',
+      'https://images.unsplash.com/photo-1488590528505-98d2b5aba04b'
     ],
     isOnSale: true,
     salePrice: 49.99,
@@ -91,8 +90,8 @@ const products: Product[] = [
     category: 'Baby Memory Boxes',
     gender: 'Unisex',
     images: [
-      '/lovable-uploads/312bb6b3-7e31-43de-8d88-907b1647f6c9.png',
-      'https://images.unsplash.com/photo-1618160702438-9b02ab6515c9'
+      'https://images.unsplash.com/photo-1518770660439-4636190af475',
+      'https://images.unsplash.com/photo-1488590528505-98d2b5aba04b'
     ],
     inStock: true,
     rating: 4.5,
@@ -106,8 +105,8 @@ const products: Product[] = [
     category: 'Cards',
     gender: 'Unisex',
     images: [
-      '/lovable-uploads/154ba4b6-fd4d-4a51-8d97-605714049497.png',
-      'https://images.unsplash.com/photo-1618160702438-9b02ab6515c9'
+      'https://images.unsplash.com/photo-1461749280684-dccba630e2f6',
+      'https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d'
     ],
     isNewArrival: true,
     inStock: true,
@@ -123,8 +122,8 @@ const products: Product[] = [
     category: 'Cards',
     gender: 'Unisex',
     images: [
-      '/lovable-uploads/154ba4b6-fd4d-4a51-8d97-605714049497.png',
-      'https://images.unsplash.com/photo-1618160702438-9b02ab6515c9'
+      'https://images.unsplash.com/photo-1461749280684-dccba630e2f6',
+      'https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d'
     ],
     inStock: true,
     rating: 4.8,
@@ -138,8 +137,8 @@ const products: Product[] = [
     category: 'Cards',
     gender: 'Unisex',
     images: [
-      '/lovable-uploads/154ba4b6-fd4d-4a51-8d97-605714049497.png',
-      'https://images.unsplash.com/photo-1618160702438-9b02ab6515c9'
+      'https://images.unsplash.com/photo-1461749280684-dccba630e2f6',
+      'https://images.unsplash.com/photo-1486312338219-ce68d2c6f44d'
     ],
     isOnSale: true,
     salePrice: 12.99,

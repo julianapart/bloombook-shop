@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
@@ -42,21 +41,21 @@ const Index = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
             <CategoryCard
               title="Photo Albums"
-              imageSrc="https://images.unsplash.com/photo-1618160702438-9b02ab6515c9"
+              imageSrc="https://images.unsplash.com/photo-1649972904349-6e44c42644a7"
               link="/shop/photo-albums"
               className={`opacity-0 animate-fade-in ${isLoaded ? 'opacity-100' : ''}`}
               style={{ animationDelay: '0.1s', animationFillMode: 'forwards' }}
             />
             <CategoryCard
               title="Baby Memory Boxes"
-              imageSrc="/lovable-uploads/312bb6b3-7e31-43de-8d88-907b1647f6c9.png"
+              imageSrc="https://images.unsplash.com/photo-1518770660439-4636190af475"
               link="/shop/baby-memory-boxes"
               className={`opacity-0 animate-fade-in ${isLoaded ? 'opacity-100' : ''}`}
               style={{ animationDelay: '0.3s', animationFillMode: 'forwards' }}
             />
             <CategoryCard
               title="Cards"
-              imageSrc="/lovable-uploads/154ba4b6-fd4d-4a51-8d97-605714049497.png"
+              imageSrc="https://images.unsplash.com/photo-1461749280684-dccba630e2f6"
               link="/shop/cards"
               className={`opacity-0 animate-fade-in ${isLoaded ? 'opacity-100' : ''}`}
               style={{ animationDelay: '0.5s', animationFillMode: 'forwards' }}
@@ -144,7 +143,7 @@ const Index = () => {
             <div className="relative">
               <div className="relative z-10 rounded-lg overflow-hidden shadow-xl transform transition-transform duration-500 hover:scale-[1.02]">
                 <img 
-                  src="https://images.unsplash.com/photo-1618160702438-9b02ab6515c9" 
+                  src="https://images.unsplash.com/photo-1488590528505-98d2b5aba04b" 
                   alt="Handcrafting process" 
                   className="w-full h-auto"
                 />
@@ -159,7 +158,7 @@ const Index = () => {
       {/* Promotion Section */}
       <section className="py-16 bg-bloombook-800 text-white relative overflow-hidden">
         <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-0 left-0 w-full h-full bg-[url('/lovable-uploads/154ba4b6-fd4d-4a51-8d97-605714049497.png')] bg-repeat opacity-20"></div>
+          <div className="absolute top-0 left-0 w-full h-full bg-[url('https://images.unsplash.com/photo-1461749280684-dccba630e2f6')] bg-repeat opacity-20"></div>
         </div>
         <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-2xl mx-auto text-center">
