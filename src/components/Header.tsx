@@ -3,6 +3,14 @@ import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Search, ShoppingCart, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+} from "@/components/ui/navigation-menu";
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -38,24 +46,70 @@ const Header = () => {
 
           {/* Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            <Link 
-              to="/shop" 
-              className={cn("header-link", location.pathname === "/shop" && "text-bloombook-600")}
-            >
-              Shop
-            </Link>
-            <Link 
-              to="/about" 
-              className={cn("header-link", location.pathname === "/about" && "text-bloombook-600")}
-            >
-              About
-            </Link>
-            <Link 
-              to="/contact" 
-              className={cn("header-link", location.pathname === "/contact" && "text-bloombook-600")}
-            >
-              Contact
-            </Link>
+            <NavigationMenu>
+              <NavigationMenuList>
+                <NavigationMenuItem>
+                  <NavigationMenuTrigger className={cn("header-link", location.pathname.includes("/shop") && "text-bloombook-600")}>
+                    Shop
+                  </NavigationMenuTrigger>
+                  <NavigationMenuContent>
+                    <ul className="grid gap-3 p-4 w-[200px]">
+                      <li className="row-span-3">
+                        <NavigationMenuLink asChild>
+                          <Link 
+                            to="/shop/all" 
+                            className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-bloombook-100 to-bloombook-200 p-4 no-underline outline-none focus:shadow-md"
+                          >
+                            <div className="text-lg font-medium text-bloombook-900">All Products</div>
+                            <p className="text-sm text-bloombook-600">Browse our entire collection</p>
+                          </Link>
+                        </NavigationMenuLink>
+                      </li>
+                      <li>
+                        <Link 
+                          to="/shop/photo-albums" 
+                          className="block select-none space-y-1 rounded-md p-3 hover:bg-bloombook-100 transition-colors"
+                        >
+                          <div className="text-sm font-medium text-bloombook-900">Photo Albums</div>
+                        </Link>
+                      </li>
+                      <li>
+                        <Link 
+                          to="/shop/memory-boxes" 
+                          className="block select-none space-y-1 rounded-md p-3 hover:bg-bloombook-100 transition-colors"
+                        >
+                          <div className="text-sm font-medium text-bloombook-900">Memory Boxes</div>
+                        </Link>
+                      </li>
+                      <li>
+                        <Link 
+                          to="/shop/post-cards" 
+                          className="block select-none space-y-1 rounded-md p-3 hover:bg-bloombook-100 transition-colors"
+                        >
+                          <div className="text-sm font-medium text-bloombook-900">Post Cards</div>
+                        </Link>
+                      </li>
+                    </ul>
+                  </NavigationMenuContent>
+                </NavigationMenuItem>
+                <NavigationMenuItem>
+                  <Link 
+                    to="/about" 
+                    className={cn("header-link", location.pathname === "/about" && "text-bloombook-600")}
+                  >
+                    About
+                  </Link>
+                </NavigationMenuItem>
+                <NavigationMenuItem>
+                  <Link 
+                    to="/contact" 
+                    className={cn("header-link", location.pathname === "/contact" && "text-bloombook-600")}
+                  >
+                    Contact
+                  </Link>
+                </NavigationMenuItem>
+              </NavigationMenuList>
+            </NavigationMenu>
           </nav>
 
           {/* Search, User and Cart */}
