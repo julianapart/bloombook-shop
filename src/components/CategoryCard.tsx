@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, CSSProperties } from 'react';
 import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 
@@ -8,9 +8,10 @@ interface CategoryCardProps {
   imageSrc: string;
   link: string;
   className?: string;
+  style?: CSSProperties;
 }
 
-const CategoryCard = ({ title, imageSrc, link, className }: CategoryCardProps) => {
+const CategoryCard = ({ title, imageSrc, link, className, style }: CategoryCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
 
   return (
@@ -19,6 +20,7 @@ const CategoryCard = ({ title, imageSrc, link, className }: CategoryCardProps) =
         "relative overflow-hidden rounded-lg shadow-md card-hover",
         className
       )}
+      style={style}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -38,7 +40,7 @@ const CategoryCard = ({ title, imageSrc, link, className }: CategoryCardProps) =
         <h3 className="text-xl font-medium text-white mb-4">{title}</h3>
         <Link 
           to={link} 
-          className="inline-block bg-white/90 hover:bg-white text-bloombook-800 px-4 py-2 rounded text-sm transition-all duration-300"
+          className="inline-block bg-white/90 hover:bg-white text-pink-700 px-4 py-2 rounded text-sm transition-all duration-300"
         >
           Shop Collection
         </Link>
