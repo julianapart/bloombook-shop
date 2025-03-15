@@ -1,0 +1,252 @@
+
+export interface Product {
+  id: number;
+  name: string;
+  description: string;
+  price: number;
+  category: 'Photo Albums' | 'Baby Memory Boxes' | 'Cards';
+  gender?: 'Boy' | 'Girl' | 'Unisex';
+  images: string[];
+  isNewArrival?: boolean;
+  isOnSale?: boolean;
+  salePrice?: number;
+  inStock: boolean;
+  rating: number;
+  reviews: number;
+  featuredOrder?: number;
+}
+
+const products: Product[] = [
+  {
+    id: 1,
+    name: 'Linen Photo Album',
+    description: 'A beautiful handcrafted photo album with linen cover and acid-free pages. Perfect for preserving your precious memories.',
+    price: 49.99,
+    category: 'Photo Albums',
+    gender: 'Unisex',
+    images: [
+      'https://images.unsplash.com/photo-1618160702438-9b02ab6515c9',
+      '/lovable-uploads/58947f85-2fe2-4022-b5d1-fed10a0ec647.png',
+      '/lovable-uploads/312bb6b3-7e31-43de-8d88-907b1647f6c9.png'
+    ],
+    isNewArrival: true,
+    inStock: true,
+    rating: 4.8,
+    reviews: 24,
+    featuredOrder: 1
+  },
+  {
+    id: 2,
+    name: 'Classic Leather Photo Album',
+    description: 'A timeless leather-bound photo album with elegant stitching and 50 acid-free pages.',
+    price: 69.99,
+    category: 'Photo Albums',
+    gender: 'Unisex',
+    images: [
+      'https://images.unsplash.com/photo-1618160702438-9b02ab6515c9',
+      '/lovable-uploads/58947f85-2fe2-4022-b5d1-fed10a0ec647.png'
+    ],
+    inStock: true,
+    rating: 4.9,
+    reviews: 36
+  },
+  {
+    id: 3,
+    name: 'Blue Baby Memory Box',
+    description: 'A handcrafted memory box for your baby boy\'s treasured keepsakes, including first tooth, lock of hair, and more.',
+    price: 59.99,
+    category: 'Baby Memory Boxes',
+    gender: 'Boy',
+    images: [
+      '/lovable-uploads/312bb6b3-7e31-43de-8d88-907b1647f6c9.png',
+      'https://images.unsplash.com/photo-1618160702438-9b02ab6515c9'
+    ],
+    inStock: true,
+    rating: 4.7,
+    reviews: 18,
+    featuredOrder: 2
+  },
+  {
+    id: 4,
+    name: 'Pink Baby Memory Box',
+    description: 'A beautifully decorated memory box for your baby girl\'s special moments and keepsakes.',
+    price: 59.99,
+    category: 'Baby Memory Boxes',
+    gender: 'Girl',
+    images: [
+      '/lovable-uploads/312bb6b3-7e31-43de-8d88-907b1647f6c9.png',
+      'https://images.unsplash.com/photo-1618160702438-9b02ab6515c9'
+    ],
+    isOnSale: true,
+    salePrice: 49.99,
+    inStock: true,
+    rating: 4.6,
+    reviews: 14
+  },
+  {
+    id: 5,
+    name: 'Neutral Baby Memory Box',
+    description: 'A gender-neutral memory box with compartments for all your baby\'s precious first items.',
+    price: 54.99,
+    category: 'Baby Memory Boxes',
+    gender: 'Unisex',
+    images: [
+      '/lovable-uploads/312bb6b3-7e31-43de-8d88-907b1647f6c9.png',
+      'https://images.unsplash.com/photo-1618160702438-9b02ab6515c9'
+    ],
+    inStock: true,
+    rating: 4.5,
+    reviews: 12
+  },
+  {
+    id: 6,
+    name: 'Birthday Card Collection',
+    description: 'A set of 5 handmade birthday cards with envelopes. Each card is unique and beautifully crafted.',
+    price: 19.99,
+    category: 'Cards',
+    gender: 'Unisex',
+    images: [
+      '/lovable-uploads/154ba4b6-fd4d-4a51-8d97-605714049497.png',
+      'https://images.unsplash.com/photo-1618160702438-9b02ab6515c9'
+    ],
+    isNewArrival: true,
+    inStock: true,
+    rating: 4.9,
+    reviews: 28,
+    featuredOrder: 3
+  },
+  {
+    id: 7,
+    name: 'Wedding Congratulations Card',
+    description: 'A beautifully handcrafted wedding card with elegant calligraphy and intricate design.',
+    price: 8.99,
+    category: 'Cards',
+    gender: 'Unisex',
+    images: [
+      '/lovable-uploads/154ba4b6-fd4d-4a51-8d97-605714049497.png',
+      'https://images.unsplash.com/photo-1618160702438-9b02ab6515c9'
+    ],
+    inStock: true,
+    rating: 4.8,
+    reviews: 15
+  },
+  {
+    id: 8,
+    name: 'Baby Shower Card Set',
+    description: 'A set of 3 handmade baby shower cards with envelopes, perfect for celebrating new arrivals.',
+    price: 14.99,
+    category: 'Cards',
+    gender: 'Unisex',
+    images: [
+      '/lovable-uploads/154ba4b6-fd4d-4a51-8d97-605714049497.png',
+      'https://images.unsplash.com/photo-1618160702438-9b02ab6515c9'
+    ],
+    isOnSale: true,
+    salePrice: 12.99,
+    inStock: true,
+    rating: 4.7,
+    reviews: 9
+  },
+  {
+    id: 9,
+    name: 'Vintage Style Photo Album',
+    description: 'A vintage-inspired photo album with decorative elements and 40 acid-free pages.',
+    price: 45.99,
+    category: 'Photo Albums',
+    gender: 'Unisex',
+    images: [
+      'https://images.unsplash.com/photo-1618160702438-9b02ab6515c9',
+      '/lovable-uploads/58947f85-2fe2-4022-b5d1-fed10a0ec647.png'
+    ],
+    inStock: true,
+    rating: 4.6,
+    reviews: 11
+  },
+  {
+    id: 10,
+    name: 'Thank You Card Set',
+    description: 'A set of 10 elegant thank you cards with matching envelopes.',
+    price: 24.99,
+    category: 'Cards',
+    gender: 'Unisex',
+    images: [
+      '/lovable-uploads/154ba4b6-fd4d-4a51-8d97-605714049497.png',
+      'https://images.unsplash.com/photo-1618160702438-9b02ab6515c9'
+    ],
+    inStock: true,
+    rating: 4.9,
+    reviews: 32
+  },
+  {
+    id: 11,
+    name: 'Deluxe Baby Memory Box',
+    description: 'Our most premium baby memory box with multiple compartments, a photo frame, and space for baby\'s first shoes.',
+    price: 79.99,
+    category: 'Baby Memory Boxes',
+    gender: 'Unisex',
+    images: [
+      '/lovable-uploads/312bb6b3-7e31-43de-8d88-907b1647f6c9.png',
+      'https://images.unsplash.com/photo-1618160702438-9b02ab6515c9'
+    ],
+    inStock: true,
+    rating: 5.0,
+    reviews: 42
+  },
+  {
+    id: 12,
+    name: 'Anniversary Card',
+    description: 'A special handcrafted card to celebrate anniversaries, with beautiful calligraphy and design.',
+    price: 9.99,
+    category: 'Cards',
+    gender: 'Unisex',
+    images: [
+      '/lovable-uploads/154ba4b6-fd4d-4a51-8d97-605714049497.png',
+      'https://images.unsplash.com/photo-1618160702438-9b02ab6515c9'
+    ],
+    inStock: true,
+    rating: 4.8,
+    reviews: 19
+  }
+];
+
+export const getFeaturedProducts = () => {
+  return products
+    .filter(product => product.featuredOrder !== undefined)
+    .sort((a, b) => (a.featuredOrder || 0) - (b.featuredOrder || 0));
+};
+
+export const getProductsByCategory = (category: string) => {
+  if (category === 'all') {
+    return products;
+  }
+  return products.filter(
+    product => product.category.toLowerCase() === category.toLowerCase()
+  );
+};
+
+export const getProductById = (id: number) => {
+  return products.find(product => product.id === id);
+};
+
+export const getRelatedProducts = (id: number, limit = 4) => {
+  const product = getProductById(id);
+  if (!product) return [];
+  
+  return products
+    .filter(p => p.category === product.category && p.id !== id)
+    .slice(0, limit);
+};
+
+export const getNewArrivals = (limit = 4) => {
+  return products
+    .filter(product => product.isNewArrival)
+    .slice(0, limit);
+};
+
+export const getOnSaleProducts = (limit = 4) => {
+  return products
+    .filter(product => product.isOnSale)
+    .slice(0, limit);
+};
+
+export default products;
