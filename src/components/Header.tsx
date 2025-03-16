@@ -44,73 +44,75 @@ const Header = () => {
             Bloombook
           </Link>
 
-          {/* Navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
-            <NavigationMenu>
-              <NavigationMenuList>
-                <NavigationMenuItem>
-                  <NavigationMenuTrigger className={cn("header-link", location.pathname.includes("/shop") && "text-bloombook-600")}>
-                    Shop
-                  </NavigationMenuTrigger>
-                  <NavigationMenuContent>
-                    <ul className="grid gap-3 p-4 w-[200px]">
-                      <li className="row-span-3">
-                        <NavigationMenuLink asChild>
+          {/* Navigation - positioned in the center with more spacing */}
+          <div className="flex-1 flex justify-center">
+            <nav className="hidden md:flex items-center">
+              <NavigationMenu className="mx-auto">
+                <NavigationMenuList className="space-x-8">
+                  <NavigationMenuItem>
+                    <NavigationMenuTrigger className={cn("header-link", location.pathname.includes("/shop") && "text-bloombook-600")}>
+                      Shop
+                    </NavigationMenuTrigger>
+                    <NavigationMenuContent>
+                      <ul className="grid gap-3 p-4 w-[200px]">
+                        <li className="row-span-3">
+                          <NavigationMenuLink asChild>
+                            <Link 
+                              to="/shop/all" 
+                              className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-bloombook-100 to-bloombook-200 p-4 no-underline outline-none focus:shadow-md"
+                            >
+                              <div className="text-lg font-medium text-bloombook-900">All Products</div>
+                              <p className="text-sm text-bloombook-600">Browse our entire collection</p>
+                            </Link>
+                          </NavigationMenuLink>
+                        </li>
+                        <li>
                           <Link 
-                            to="/shop/all" 
-                            className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-bloombook-100 to-bloombook-200 p-4 no-underline outline-none focus:shadow-md"
+                            to="/shop/photo-albums" 
+                            className="block select-none space-y-1 rounded-md p-3 hover:bg-bloombook-100 transition-colors"
                           >
-                            <div className="text-lg font-medium text-bloombook-900">All Products</div>
-                            <p className="text-sm text-bloombook-600">Browse our entire collection</p>
+                            <div className="text-sm font-medium text-bloombook-900">Photo Albums</div>
                           </Link>
-                        </NavigationMenuLink>
-                      </li>
-                      <li>
-                        <Link 
-                          to="/shop/photo-albums" 
-                          className="block select-none space-y-1 rounded-md p-3 hover:bg-bloombook-100 transition-colors"
-                        >
-                          <div className="text-sm font-medium text-bloombook-900">Photo Albums</div>
-                        </Link>
-                      </li>
-                      <li>
-                        <Link 
-                          to="/shop/memory-boxes" 
-                          className="block select-none space-y-1 rounded-md p-3 hover:bg-bloombook-100 transition-colors"
-                        >
-                          <div className="text-sm font-medium text-bloombook-900">Memory Boxes</div>
-                        </Link>
-                      </li>
-                      <li>
-                        <Link 
-                          to="/shop/post-cards" 
-                          className="block select-none space-y-1 rounded-md p-3 hover:bg-bloombook-100 transition-colors"
-                        >
-                          <div className="text-sm font-medium text-bloombook-900">Post Cards</div>
-                        </Link>
-                      </li>
-                    </ul>
-                  </NavigationMenuContent>
-                </NavigationMenuItem>
-                <NavigationMenuItem>
-                  <Link 
-                    to="/about" 
-                    className={cn("header-link", location.pathname === "/about" && "text-bloombook-600")}
-                  >
-                    About
-                  </Link>
-                </NavigationMenuItem>
-                <NavigationMenuItem>
-                  <Link 
-                    to="/contact" 
-                    className={cn("header-link", location.pathname === "/contact" && "text-bloombook-600")}
-                  >
-                    Contact
-                  </Link>
-                </NavigationMenuItem>
-              </NavigationMenuList>
-            </NavigationMenu>
-          </nav>
+                        </li>
+                        <li>
+                          <Link 
+                            to="/shop/memory-boxes" 
+                            className="block select-none space-y-1 rounded-md p-3 hover:bg-bloombook-100 transition-colors"
+                          >
+                            <div className="text-sm font-medium text-bloombook-900">Memory Boxes</div>
+                          </Link>
+                        </li>
+                        <li>
+                          <Link 
+                            to="/shop/post-cards" 
+                            className="block select-none space-y-1 rounded-md p-3 hover:bg-bloombook-100 transition-colors"
+                          >
+                            <div className="text-sm font-medium text-bloombook-900">Post Cards</div>
+                          </Link>
+                        </li>
+                      </ul>
+                    </NavigationMenuContent>
+                  </NavigationMenuItem>
+                  <NavigationMenuItem>
+                    <Link 
+                      to="/about" 
+                      className={cn("header-link px-4 py-2", location.pathname === "/about" && "text-bloombook-600")}
+                    >
+                      About
+                    </Link>
+                  </NavigationMenuItem>
+                  <NavigationMenuItem>
+                    <Link 
+                      to="/contact" 
+                      className={cn("header-link px-4 py-2", location.pathname === "/contact" && "text-bloombook-600")}
+                    >
+                      Contact
+                    </Link>
+                  </NavigationMenuItem>
+                </NavigationMenuList>
+              </NavigationMenu>
+            </nav>
+          </div>
 
           {/* Search, User and Cart */}
           <div className="flex items-center space-x-2 md:space-x-4">
