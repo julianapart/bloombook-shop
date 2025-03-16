@@ -117,16 +117,16 @@ const Shop = () => {
             <aside className="hidden md:block w-64 flex-shrink-0">
               <div className="sticky top-24">
                 <div className="bg-white rounded-lg shadow-sm border border-bloombook-100 p-6">
-                  <h2 className="font-medium text-lg text-bloombook-900 mb-4">Filter by</h2>
+                  <h2 className="font-medium text-xl text-bloombook-900 mb-6">Filter by</h2>
                   
                   <div className="mb-6">
-                    <h3 className="font-medium text-bloombook-900 mb-2">Categories</h3>
-                    <ul className="space-y-2">
+                    <h3 className="font-medium text-lg text-bloombook-900 mb-4">Categories</h3>
+                    <ul className="space-y-3">
                       <li>
                         <Link 
                           to="/shop/all"
                           className={cn(
-                            "block w-full text-left py-1 transition-colors",
+                            "block w-full text-left py-1 transition-colors text-base",
                             category === 'all' 
                               ? "text-bloombook-700 font-medium" 
                               : "text-bloombook-600 hover:text-bloombook-800"
@@ -139,7 +139,7 @@ const Shop = () => {
                         <Link 
                           to="/shop/photo-albums"
                           className={cn(
-                            "block w-full text-left py-1 transition-colors",
+                            "block w-full text-left py-1 transition-colors text-base",
                             category === 'photo-albums' 
                               ? "text-bloombook-700 font-medium" 
                               : "text-bloombook-600 hover:text-bloombook-800"
@@ -152,7 +152,7 @@ const Shop = () => {
                         <Link 
                           to="/shop/baby-memory-boxes"
                           className={cn(
-                            "block w-full text-left py-1 transition-colors",
+                            "block w-full text-left py-1 transition-colors text-base",
                             category === 'baby-memory-boxes' 
                               ? "text-bloombook-700 font-medium" 
                               : "text-bloombook-600 hover:text-bloombook-800"
@@ -165,7 +165,7 @@ const Shop = () => {
                         <Link 
                           to="/shop/cards"
                           className={cn(
-                            "block w-full text-left py-1 transition-colors",
+                            "block w-full text-left py-1 transition-colors text-base",
                             category === 'cards' 
                               ? "text-bloombook-700 font-medium" 
                               : "text-bloombook-600 hover:text-bloombook-800"
@@ -178,7 +178,7 @@ const Shop = () => {
                   </div>
                   
                   <div className="mb-6">
-                    <h3 className="font-medium text-bloombook-900 mb-3">Price range</h3>
+                    <h3 className="font-medium text-lg text-bloombook-900 mb-4">Price range</h3>
                     <Slider
                       value={priceRange}
                       min={0}
@@ -194,8 +194,8 @@ const Shop = () => {
                   </div>
                   
                   <div>
-                    <h3 className="font-medium text-bloombook-900 mb-3">Gender</h3>
-                    <div className="space-y-2">
+                    <h3 className="font-medium text-lg text-bloombook-900 mb-4">Gender</h3>
+                    <div className="space-y-3">
                       <div className="flex items-center">
                         <Checkbox 
                           id="gender-all" 
@@ -205,7 +205,7 @@ const Shop = () => {
                         />
                         <label 
                           htmlFor="gender-all" 
-                          className="ml-2 text-bloombook-700 text-sm cursor-pointer"
+                          className="ml-2 text-bloombook-700 text-base cursor-pointer"
                         >
                           All
                         </label>
@@ -219,7 +219,7 @@ const Shop = () => {
                         />
                         <label 
                           htmlFor="gender-boy" 
-                          className="ml-2 text-bloombook-700 text-sm cursor-pointer"
+                          className="ml-2 text-bloombook-700 text-base cursor-pointer"
                         >
                           Boy
                         </label>
@@ -233,7 +233,7 @@ const Shop = () => {
                         />
                         <label 
                           htmlFor="gender-girl" 
-                          className="ml-2 text-bloombook-700 text-sm cursor-pointer"
+                          className="ml-2 text-bloombook-700 text-base cursor-pointer"
                         >
                           Girl
                         </label>
@@ -247,7 +247,7 @@ const Shop = () => {
                         />
                         <label 
                           htmlFor="gender-unisex" 
-                          className="ml-2 text-bloombook-700 text-sm cursor-pointer"
+                          className="ml-2 text-bloombook-700 text-base cursor-pointer"
                         >
                           Unisex
                         </label>
@@ -270,10 +270,10 @@ const Shop = () => {
               
               {isFilterOpen && (
                 <div className="mt-4 p-4 bg-white rounded-lg shadow-sm border border-bloombook-100">
-                  <h3 className="font-medium text-lg text-bloombook-900 mb-4">Filter by</h3>
+                  <h3 className="font-medium text-xl text-bloombook-900 mb-6">Filter by</h3>
                 
                   <div className="mb-6">
-                    <h3 className="font-medium text-bloombook-900 mb-2">Categories</h3>
+                    <h3 className="font-medium text-lg text-bloombook-900 mb-4">Categories</h3>
                     <div className="grid grid-cols-2 gap-2">
                       <Link 
                         to="/shop/all"
@@ -323,7 +323,7 @@ const Shop = () => {
                   </div>
                   
                   <div className="mb-6">
-                    <h3 className="font-medium text-bloombook-900 mb-3">Price range</h3>
+                    <h3 className="font-medium text-lg text-bloombook-900 mb-4">Price range</h3>
                     <Slider
                       value={priceRange}
                       min={0}
@@ -339,8 +339,8 @@ const Shop = () => {
                   </div>
                   
                   <div>
-                    <h3 className="font-medium text-bloombook-900 mb-3">Gender</h3>
-                    <div className="grid grid-cols-2 gap-2">
+                    <h3 className="font-medium text-lg text-bloombook-900 mb-4">Gender</h3>
+                    <div className="grid grid-cols-2 gap-3">
                       <div className="flex items-center">
                         <Checkbox 
                           id="mobile-gender-all" 
@@ -350,7 +350,7 @@ const Shop = () => {
                         />
                         <label 
                           htmlFor="mobile-gender-all" 
-                          className="ml-2 text-bloombook-700 text-sm cursor-pointer"
+                          className="ml-2 text-bloombook-700 text-base cursor-pointer"
                         >
                           All
                         </label>
@@ -364,7 +364,7 @@ const Shop = () => {
                         />
                         <label 
                           htmlFor="mobile-gender-boy" 
-                          className="ml-2 text-bloombook-700 text-sm cursor-pointer"
+                          className="ml-2 text-bloombook-700 text-base cursor-pointer"
                         >
                           Boy
                         </label>
@@ -378,7 +378,7 @@ const Shop = () => {
                         />
                         <label 
                           htmlFor="mobile-gender-girl" 
-                          className="ml-2 text-bloombook-700 text-sm cursor-pointer"
+                          className="ml-2 text-bloombook-700 text-base cursor-pointer"
                         >
                           Girl
                         </label>
@@ -392,7 +392,7 @@ const Shop = () => {
                         />
                         <label 
                           htmlFor="mobile-gender-unisex" 
-                          className="ml-2 text-bloombook-700 text-sm cursor-pointer"
+                          className="ml-2 text-bloombook-700 text-base cursor-pointer"
                         >
                           Unisex
                         </label>
