@@ -117,62 +117,62 @@ const Shop = () => {
             <aside className="hidden md:block w-64 flex-shrink-0">
               <div className="sticky top-24">
                 <div className="bg-white rounded-lg shadow-sm border border-bloombook-100 p-6">
-                  <h2 className="font-medium text-lg text-bloombook-900 mb-4">Browse by</h2>
+                  <h2 className="font-medium text-lg text-bloombook-900 mb-4">Filter by</h2>
                   
                   <div className="mb-6">
                     <h3 className="font-medium text-bloombook-900 mb-2">Categories</h3>
                     <ul className="space-y-2">
                       <li>
-                        <button 
-                          onClick={() => handleCategoryChange('all')}
+                        <Link 
+                          to="/shop/all"
                           className={cn(
-                            "w-full text-left py-1 transition-colors",
+                            "block w-full text-left py-1 transition-colors",
                             category === 'all' 
                               ? "text-bloombook-700 font-medium" 
                               : "text-bloombook-600 hover:text-bloombook-800"
                           )}
                         >
                           All Products
-                        </button>
+                        </Link>
                       </li>
                       <li>
-                        <button 
-                          onClick={() => handleCategoryChange('photo-albums')}
+                        <Link 
+                          to="/shop/photo-albums"
                           className={cn(
-                            "w-full text-left py-1 transition-colors",
+                            "block w-full text-left py-1 transition-colors",
                             category === 'photo-albums' 
                               ? "text-bloombook-700 font-medium" 
                               : "text-bloombook-600 hover:text-bloombook-800"
                           )}
                         >
                           Photo Albums
-                        </button>
+                        </Link>
                       </li>
                       <li>
-                        <button 
-                          onClick={() => handleCategoryChange('baby-memory-boxes')}
+                        <Link 
+                          to="/shop/baby-memory-boxes"
                           className={cn(
-                            "w-full text-left py-1 transition-colors",
+                            "block w-full text-left py-1 transition-colors",
                             category === 'baby-memory-boxes' 
                               ? "text-bloombook-700 font-medium" 
                               : "text-bloombook-600 hover:text-bloombook-800"
                           )}
                         >
                           Baby Memory Boxes
-                        </button>
+                        </Link>
                       </li>
                       <li>
-                        <button 
-                          onClick={() => handleCategoryChange('cards')}
+                        <Link 
+                          to="/shop/cards"
                           className={cn(
-                            "w-full text-left py-1 transition-colors",
+                            "block w-full text-left py-1 transition-colors",
                             category === 'cards' 
                               ? "text-bloombook-700 font-medium" 
                               : "text-bloombook-600 hover:text-bloombook-800"
                           )}
                         >
                           Cards
-                        </button>
+                        </Link>
                       </li>
                     </ul>
                   </div>
@@ -180,7 +180,7 @@ const Shop = () => {
                   <div className="mb-6">
                     <h3 className="font-medium text-bloombook-900 mb-3">Price range</h3>
                     <Slider
-                      defaultValue={[0, 100]}
+                      value={priceRange}
                       min={0}
                       max={100}
                       step={1}
@@ -270,60 +270,62 @@ const Shop = () => {
               
               {isFilterOpen && (
                 <div className="mt-4 p-4 bg-white rounded-lg shadow-sm border border-bloombook-100">
+                  <h3 className="font-medium text-lg text-bloombook-900 mb-4">Filter by</h3>
+                
                   <div className="mb-6">
                     <h3 className="font-medium text-bloombook-900 mb-2">Categories</h3>
                     <div className="grid grid-cols-2 gap-2">
-                      <button 
-                        onClick={() => handleCategoryChange('all')}
+                      <Link 
+                        to="/shop/all"
                         className={cn(
-                          "px-3 py-2 rounded-md text-sm",
+                          "px-3 py-2 rounded-md text-sm text-center",
                           category === 'all' 
                             ? "bg-bloombook-100 text-bloombook-800 font-medium" 
                             : "bg-white border border-bloombook-200 text-bloombook-600"
                         )}
                       >
                         All Products
-                      </button>
-                      <button 
-                        onClick={() => handleCategoryChange('photo-albums')}
+                      </Link>
+                      <Link 
+                        to="/shop/photo-albums"
                         className={cn(
-                          "px-3 py-2 rounded-md text-sm",
+                          "px-3 py-2 rounded-md text-sm text-center",
                           category === 'photo-albums' 
                             ? "bg-bloombook-100 text-bloombook-800 font-medium" 
                             : "bg-white border border-bloombook-200 text-bloombook-600"
                         )}
                       >
                         Photo Albums
-                      </button>
-                      <button 
-                        onClick={() => handleCategoryChange('baby-memory-boxes')}
+                      </Link>
+                      <Link 
+                        to="/shop/baby-memory-boxes"
                         className={cn(
-                          "px-3 py-2 rounded-md text-sm",
+                          "px-3 py-2 rounded-md text-sm text-center",
                           category === 'baby-memory-boxes' 
                             ? "bg-bloombook-100 text-bloombook-800 font-medium" 
                             : "bg-white border border-bloombook-200 text-bloombook-600"
                         )}
                       >
                         Baby Memory Boxes
-                      </button>
-                      <button 
-                        onClick={() => handleCategoryChange('cards')}
+                      </Link>
+                      <Link 
+                        to="/shop/cards"
                         className={cn(
-                          "px-3 py-2 rounded-md text-sm",
+                          "px-3 py-2 rounded-md text-sm text-center",
                           category === 'cards' 
                             ? "bg-bloombook-100 text-bloombook-800 font-medium" 
                             : "bg-white border border-bloombook-200 text-bloombook-600"
                         )}
                       >
                         Cards
-                      </button>
+                      </Link>
                     </div>
                   </div>
                   
                   <div className="mb-6">
                     <h3 className="font-medium text-bloombook-900 mb-3">Price range</h3>
                     <Slider
-                      defaultValue={[0, 100]}
+                      value={priceRange}
                       min={0}
                       max={100}
                       step={1}

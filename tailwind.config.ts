@@ -161,9 +161,9 @@ export default {
 				'slide-down': 'slide-down 0.5s ease-in-out'
 			},
 			fontFamily: {
-				'sans': ['Inter', 'system-ui', 'sans-serif'],
-				'serif': ['Playfair Display', 'Georgia', 'serif'],
-				'handwriting': ['Dancing Script', 'cursive']
+				'sans': ['Poppins', 'system-ui', 'sans-serif'],
+				'serif': ['Montserrat', 'Georgia', 'serif'],
+				'handwriting': ['Caveat', 'cursive']
 			},
 			backdropBlur: {
 				xs: '2px',

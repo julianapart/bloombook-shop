@@ -45,10 +45,10 @@ const Header = () => {
           </Link>
 
           {/* Navigation - positioned in the center with more spacing */}
-          <div className="flex-1 flex justify-center">
-            <nav className="hidden md:flex items-center">
+          <div className="hidden md:flex flex-1 justify-center">
+            <nav className="flex items-center w-full max-w-md justify-center">
               <NavigationMenu className="mx-auto">
-                <NavigationMenuList className="space-x-8">
+                <NavigationMenuList className="space-x-12">
                   <NavigationMenuItem>
                     <NavigationMenuTrigger className={cn("header-link", location.pathname.includes("/shop") && "text-bloombook-600")}>
                       Shop
