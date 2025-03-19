@@ -1,6 +1,7 @@
 
 import { createContext, useContext, useReducer, useEffect } from 'react';
 import { toast } from 'sonner';
+import { useAuth } from './AuthContext';
 
 // Define types for cart items and context
 export interface CartItem {
@@ -32,7 +33,8 @@ type CartAction =
   | { type: 'ADD_ITEM'; payload: CartItem }
   | { type: 'REMOVE_ITEM'; payload: number }
   | { type: 'UPDATE_QUANTITY'; payload: { id: number; quantity: number } }
-  | { type: 'CLEAR_CART' };
+  | { type: 'CLEAR_CART' }
+  | { type: 'SET_CART'; payload: CartState };
 
 // Initial state
 const initialState: CartState = {
@@ -126,6 +128,9 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
     case 'CLEAR_CART':
       return initialState;
 
+    case 'SET_CART':
+      return action.payload;
+
     default:
       return state;
   }
@@ -133,24 +138,45 @@ const cartReducer = (state: CartState, action: CartAction): CartState => {
 
 // Provider component
 export const CartProvider = ({ children }: { children: React.ReactNode }) => {
-  const [state, dispatch] = useReducer(cartReducer, initialState, () => {
-    // Initialize from localStorage if available
-    const savedCart = localStorage.getItem('cart');
-    if (savedCart) {
-      try {
-        return JSON.parse(savedCart);
-      } catch (error) {
-        console.error('Failed to parse saved cart:', error);
-        return initialState;
+  const { isAuthenticated, user } = useAuth();
+  const [state, dispatch] = useReducer(cartReducer, initialState);
+
+  // Load cart from localStorage when user changes
+  useEffect(() => {
+    if (isAuthenticated && user?.id) {
+      const cartKey = `cart_${user.id}`;
+      const savedCart = localStorage.getItem(cartKey);
+      
+      if (savedCart) {
+        try {
+          const parsedCart = JSON.parse(savedCart);
+          dispatch({ type: 'SET_CART', payload: parsedCart });
+        } catch (error) {
+          console.error('Failed to parse saved cart:', error);
+          localStorage.removeItem(cartKey);
+        }
+      }
+    } else {
+      // For non-authenticated users, use a default cart key
+      const savedCart = localStorage.getItem('cart_guest');
+      
+      if (savedCart) {
+        try {
+          const parsedCart = JSON.parse(savedCart);
+          dispatch({ type: 'SET_CART', payload: parsedCart });
+        } catch (error) {
+          console.error('Failed to parse saved cart:', error);
+          localStorage.removeItem('cart_guest');
+        }
       }
     }
-    return initialState;
-  });
+  }, [isAuthenticated, user?.id]);
 
-  // Save to localStorage when state changes
+  // Save cart to localStorage when state changes
   useEffect(() => {
-    localStorage.setItem('cart', JSON.stringify(state));
-  }, [state]);
+    const cartKey = isAuthenticated && user?.id ? `cart_${user.id}` : 'cart_guest';
+    localStorage.setItem(cartKey, JSON.stringify(state));
+  }, [state, isAuthenticated, user?.id]);
 
   // Action functions
   const addToCart = (item: CartItem) => {
