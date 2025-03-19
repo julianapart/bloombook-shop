@@ -7,7 +7,7 @@ const About = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
-      <main className="flex-grow container mx-auto px-4 py-16">
+      <main className="flex-grow container mx-auto px-4 py-22">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-4xl font-serif font-bold text-bloombook-900 mb-8">About Bloombook</h1>
           
