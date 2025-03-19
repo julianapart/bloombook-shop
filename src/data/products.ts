@@ -1,10 +1,9 @@
-
 export interface Product {
   id: number;
   name: string;
   description: string;
   price: number;
-  category: 'Photo Albums' | 'Baby Memory Boxes' | 'Cards';
+  category: 'Photo Albums' | 'Digital Products' | 'Cards';
   gender?: 'Boy' | 'Girl' | 'Unisex';
   images: string[];
   isNewArrival?: boolean;
@@ -52,10 +51,10 @@ const products: Product[] = [
   },
   {
     id: 3,
-    name: 'Blue Baby Memory Box',
-    description: 'A handcrafted memory box for your baby boy\'s treasured keepsakes, including first tooth, lock of hair, and more.',
+    name: 'Blue Digital Template',
+    description: 'A professionally designed digital template for your baby boy\'s treasured keepsakes, including first tooth, lock of hair, and more.',
     price: 59.99,
-    category: 'Baby Memory Boxes',
+    category: 'Digital Products',
     gender: 'Boy',
     images: [
       'https://images.unsplash.com/photo-1518770660439-4636190af475',
@@ -68,10 +67,10 @@ const products: Product[] = [
   },
   {
     id: 4,
-    name: 'Pink Baby Memory Box',
-    description: 'A beautifully decorated memory box for your baby girl\'s special moments and keepsakes.',
+    name: 'Pink Digital Template',
+    description: 'A beautifully decorated digital template for your baby girl\'s special moments and keepsakes.',
     price: 59.99,
-    category: 'Baby Memory Boxes',
+    category: 'Digital Products',
     gender: 'Girl',
     images: [
       'https://images.unsplash.com/photo-1518770660439-4636190af475',
@@ -85,10 +84,10 @@ const products: Product[] = [
   },
   {
     id: 5,
-    name: 'Neutral Baby Memory Box',
-    description: 'A gender-neutral memory box with compartments for all your baby\'s precious first items.',
+    name: 'Neutral Digital Template',
+    description: 'A gender-neutral digital template with compartments for all your baby\'s precious first items.',
     price: 54.99,
-    category: 'Baby Memory Boxes',
+    category: 'Digital Products',
     gender: 'Unisex',
     images: [
       'https://images.unsplash.com/photo-1518770660439-4636190af475',

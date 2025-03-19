@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
@@ -33,7 +34,7 @@ const Index = () => {
               Our Collections
             </h2>
             <p className="text-bloombook-600 max-w-2xl mx-auto">
-              Explore our carefully crafted collections of photo albums, baby memory boxes,
+              Explore our carefully crafted collections of photo albums, digital products,
               and beautiful handmade cards.
             </p>
           </div>
@@ -47,9 +48,9 @@ const Index = () => {
               style={{ animationDelay: '0.1s', animationFillMode: 'forwards' }}
             />
             <CategoryCard
-              title="Baby Memory Boxes"
+              title="Digital Products"
               imageSrc="https://images.unsplash.com/photo-1518770660439-4636190af475"
-              link="/shop/baby-memory-boxes"
+              link="/shop/digital-products"
               className={`opacity-0 animate-fade-in ${isLoaded ? 'opacity-100' : ''}`}
               style={{ animationDelay: '0.3s', animationFillMode: 'forwards' }}
             />

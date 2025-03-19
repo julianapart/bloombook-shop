@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Search, ShoppingCart, User, LogOut, Menu, X } from 'lucide-react';
@@ -47,7 +46,6 @@ const Header = () => {
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle search logic here
     console.log('Search for:', searchQuery);
   };
 
@@ -65,12 +63,10 @@ const Header = () => {
     )}>
       <div className="container mx-auto">
         <div className="flex items-center justify-between">
-          {/* Logo */}
           <Link to="/" className="font-serif text-2xl font-semibold text-bloombook-900 transition-all hover:opacity-80">
             Bloombook
           </Link>
 
-          {/* Navigation - positioned in the center with more spacing */}
           <div className="hidden md:flex flex-1 justify-center">
             <nav className="flex items-center w-full max-w-md justify-center">
               <NavigationMenu className="mx-auto">
@@ -102,15 +98,15 @@ const Header = () => {
                         </li>
                         <li>
                           <Link 
-                            to="/shop/memory-boxes" 
+                            to="/shop/digital-products" 
                             className="block select-none space-y-1 rounded-md p-3 hover:bg-bloombook-100 transition-colors"
                           >
-                            <div className="text-sm font-medium text-bloombook-900">Memory Boxes</div>
+                            <div className="text-sm font-medium text-bloombook-900">Digital Products</div>
                           </Link>
                         </li>
                         <li>
                           <Link 
-                            to="/shop/post-cards" 
+                            to="/shop/cards" 
                             className="block select-none space-y-1 rounded-md p-3 hover:bg-bloombook-100 transition-colors"
                           >
                             <div className="text-sm font-medium text-bloombook-900">Post Cards</div>
@@ -140,7 +136,6 @@ const Header = () => {
             </nav>
           </div>
 
-          {/* Search, User and Cart */}
           <div className="flex items-center space-x-2 md:space-x-4">
             <form onSubmit={handleSearchSubmit} className="relative hidden md:block">
               <input
@@ -206,7 +201,6 @@ const Header = () => {
               )}
             </Link>
 
-            {/* Mobile menu trigger */}
             <Sheet>
               <SheetTrigger className="md:hidden p-2 rounded-full hover:bg-bloombook-100 transition-colors">
                 <Menu size={20} className="text-bloombook-700" />
@@ -273,17 +267,17 @@ const Header = () => {
                           <li>
                             <SheetClose asChild>
                               <Link 
-                                to="/shop/memory-boxes"
+                                to="/shop/digital-products"
                                 className="block p-2 text-sm rounded-md hover:bg-bloombook-50"
                               >
-                                Memory Boxes
+                                Digital Products
                               </Link>
                             </SheetClose>
                           </li>
                           <li>
                             <SheetClose asChild>
                               <Link 
-                                to="/shop/post-cards"
+                                to="/shop/cards"
                                 className="block p-2 text-sm rounded-md hover:bg-bloombook-50"
                               >
                                 Post Cards

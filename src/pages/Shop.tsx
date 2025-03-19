@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { Slider } from "@/components/ui/slider";
@@ -73,8 +72,8 @@ const Shop = () => {
     switch (categorySlug) {
       case 'photo-albums':
         return 'Photo Albums';
-      case 'baby-memory-boxes':
-        return 'Baby Memory Boxes';
+      case 'digital-products':
+        return 'Digital Products';
       case 'cards':
         return 'Cards';
       case 'all':
@@ -150,15 +149,15 @@ const Shop = () => {
                       </li>
                       <li>
                         <Link 
-                          to="/shop/baby-memory-boxes"
+                          to="/shop/digital-products"
                           className={cn(
                             "block w-full text-left py-1 transition-colors text-base",
-                            category === 'baby-memory-boxes' 
+                            category === 'digital-products' 
                               ? "text-bloombook-700 font-medium" 
                               : "text-bloombook-600 hover:text-bloombook-800"
                           )}
                         >
-                          Baby Memory Boxes
+                          Digital Products
                         </Link>
                       </li>
                       <li>
@@ -298,15 +297,15 @@ const Shop = () => {
                         Photo Albums
                       </Link>
                       <Link 
-                        to="/shop/baby-memory-boxes"
+                        to="/shop/digital-products"
                         className={cn(
                           "px-3 py-2 rounded-md text-sm text-center",
-                          category === 'baby-memory-boxes' 
+                          category === 'digital-products' 
                             ? "bg-bloombook-100 text-bloombook-800 font-medium" 
                             : "bg-white border border-bloombook-200 text-bloombook-600"
                         )}
                       >
-                        Baby Memory Boxes
+                        Digital Products
                       </Link>
                       <Link 
                         to="/shop/cards"

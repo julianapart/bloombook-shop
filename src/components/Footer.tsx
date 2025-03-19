@@ -1,4 +1,3 @@
-
 import { Link } from 'react-router-dom';
 import { Facebook, Instagram, Twitter } from 'lucide-react';
 
@@ -16,7 +15,7 @@ const Footer = () => {
             </Link>
             <p className="mt-4 text-bloombook-600 text-sm leading-relaxed">
               Handcrafted with love, our products celebrate life's precious moments through 
-              thoughtfully designed photo albums, memory boxes, and cards.
+              thoughtfully designed photo albums, digital products, and cards.
             </p>
             <div className="flex mt-6 space-x-4">
               <a href="#" className="text-bloombook-600 hover:text-bloombook-800 transition-colors">
@@ -41,8 +40,8 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
-                <Link to="/shop/baby-memory-boxes" className="hover:text-bloombook-800 transition-colors">
-                  Baby Memory Boxes
+                <Link to="/shop/digital-products" className="hover:text-bloombook-800 transition-colors">
+                  Digital Products
                 </Link>
               </li>
               <li>
