@@ -1,3 +1,4 @@
+
 export interface Product {
   id: number;
   name: string;
@@ -181,7 +182,7 @@ const products: Product[] = [
     name: 'Deluxe Baby Memory Box',
     description: 'Our most premium baby memory box with multiple compartments, a photo frame, and space for baby\'s first shoes.',
     price: 79.99,
-    category: 'Baby Memory Boxes',
+    category: 'Digital Products',
     gender: 'Unisex',
     images: [
       'https://images.unsplash.com/photo-1518770660439-4636190af475',
