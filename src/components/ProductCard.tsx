@@ -3,6 +3,8 @@ import { useState, CSSProperties } from 'react';
 import { Link } from 'react-router-dom';
 import { Heart, ShoppingCart } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useCart } from '@/context/CartContext';
+import { toast } from 'sonner';
 
 interface ProductCardProps {
   id: number;
@@ -30,12 +32,25 @@ const ProductCard = ({
   style 
 }: ProductCardProps) => {
   const [isHovered, setIsHovered] = useState(false);
+  const { addToCart } = useCart();
 
   const formatPrice = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD'
     }).format(amount);
+  };
+
+  const handleAddToCart = () => {
+    const productPrice = isOnSale && salePrice ? salePrice : price;
+    
+    addToCart({
+      id,
+      name,
+      price: productPrice,
+      quantity: 1,
+      imageSrc
+    });
   };
 
   return (
@@ -93,6 +108,7 @@ const ProductCard = ({
       >
         <button 
           className="w-full py-2 flex items-center justify-center gap-2 bg-pink-600 hover:bg-pink-700 text-white text-sm font-medium rounded transition-colors duration-300"
+          onClick={handleAddToCart}
         >
           <ShoppingCart size={16} />
           Add to cart
