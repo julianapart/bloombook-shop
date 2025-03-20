@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { Slider } from "@/components/ui/slider";
@@ -16,7 +17,7 @@ type GenderFilter = 'all' | 'boy' | 'girl' | 'unisex';
 const Shop = () => {
   const { category = 'all' } = useParams<{ category: string }>();
   const [products, setProducts] = useState(getProductsByCategory(category));
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 100]);
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, 200]);
   const [genderFilter, setGenderFilter] = useState<GenderFilter>('all');
   const [sortBy, setSortBy] = useState<SortOption>('newest');
   const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -194,7 +195,7 @@ const Shop = () => {
                     <Slider
                       value={priceRange}
                       min={0}
-                      max={100}
+                      max={200}
                       step={1}
                       onValueChange={(value) => setPriceRange(value as [number, number])}
                       className="mb-3"
@@ -352,7 +353,7 @@ const Shop = () => {
                     <Slider
                       value={priceRange}
                       min={0}
-                      max={100}
+                      max={200}
                       step={1}
                       onValueChange={(value) => setPriceRange(value as [number, number])}
                       className="mb-3"
@@ -489,7 +490,7 @@ const Shop = () => {
                   </p>
                   <button 
                     onClick={() => {
-                      setPriceRange([0, 100]);
+                      setPriceRange([0, 200]);
                       setGenderFilter('all');
                       setSortBy('newest');
                     }}
