@@ -39,7 +39,7 @@ const Hero = () => {
             Est. 2015
           </span>
           <h1 className="mt-2 mb-6 text-5xl md:text-7xl font-semibold text-pink-900 font-serif">
-            Bloombook
+            BloomBook
           </h1>
           <p className="mx-auto mb-8 text-xl font-handwriting text-teal-800 max-w-xl">
             Bringing you joy

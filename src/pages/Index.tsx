@@ -125,7 +125,7 @@ const Index = () => {
                 About Us
               </h2>
               <p className="text-bloombook-600 mb-4 leading-relaxed">
-                Bloombook was founded in 2015 with a simple mission: to help people preserve their most precious memories
+                BloomBook was founded in 2015 with a simple mission: to help people preserve their most precious memories
                 in beautiful, handcrafted keepsakes that will last for generations.
               </p>
               <p className="text-bloombook-600 mb-6 leading-relaxed">

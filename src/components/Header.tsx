@@ -64,7 +64,7 @@ const Header = () => {
       <div className="container mx-auto">
         <div className="flex items-center justify-between">
           <Link to="/" className="font-serif text-2xl font-semibold text-bloombook-900 transition-all hover:opacity-80">
-            Bloombook
+            BloomBook
           </Link>
 
           <div className="hidden md:flex flex-1 justify-center">
@@ -209,7 +209,7 @@ const Header = () => {
                 <div className="py-4 flex flex-col h-full">
                   <div className="mb-8">
                     <Link to="/" className="font-serif text-xl font-semibold text-bloombook-900 hover:text-bloombook-700">
-                      Bloombook
+                      BloomBook
                     </Link>
                   </div>
 

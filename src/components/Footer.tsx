@@ -1,3 +1,4 @@
+
 import { Link } from 'react-router-dom';
 import { Facebook, Instagram, Twitter } from 'lucide-react';
 
@@ -11,7 +12,7 @@ const Footer = () => {
           {/* Brand */}
           <div className="col-span-1 md:col-span-1">
             <Link to="/" className="font-serif text-2xl font-semibold text-bloombook-900">
-              Bloombook
+              BloomBook
             </Link>
             <p className="mt-4 text-bloombook-600 text-sm leading-relaxed">
               Handcrafted with love, our products celebrate life's precious moments through 
@@ -109,7 +110,7 @@ const Footer = () => {
         
         {/* Bottom */}
         <div className="mt-12 pt-6 border-t border-bloombook-200 flex flex-col md:flex-row justify-between items-center text-sm text-bloombook-500">
-          <p>© {currentYear} Bloombook. All rights reserved.</p>
+          <p>© {currentYear} BloomBook. All rights reserved.</p>
           <div className="mt-4 md:mt-0 flex space-x-6">
             <Link to="/privacy" className="hover:text-bloombook-800 transition-colors">
               Privacy Policy

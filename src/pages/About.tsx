@@ -9,11 +9,11 @@ const About = () => {
       <Header />
       <main className="flex-grow container mx-auto px-4 py-16">
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-4xl font-serif font-bold text-bloombook-900 mb-8">About Bloombook</h1>
+          <h1 className="text-4xl font-serif font-bold text-bloombook-900 mb-8">About BloomBook</h1>
           
           <div className="prose prose-lg max-w-none text-bloombook-700 space-y-6">
             <p>
-              Founded in 2023, Bloombook is dedicated to preserving your most cherished memories through beautifully crafted photo albums, memory boxes, and custom stationery.
+              Founded in 2023, BloomBook is dedicated to preserving your most cherished memories through beautifully crafted photo albums, memory boxes, and custom stationery.
             </p>
             
             <p>
@@ -23,7 +23,7 @@ const About = () => {
             <h2 className="text-2xl font-serif font-semibold text-bloombook-800 mt-10 mb-4">Our Story</h2>
             
             <p>
-              Bloombook began with a simple idea: to create memory-keeping products that are as beautiful as the moments they preserve. Our founder, an avid photographer and memory keeper, was frustrated by the lack of high-quality, customizable photo albums that truly did justice to life's special moments.
+              BloomBook began with a simple idea: to create memory-keeping products that are as beautiful as the moments they preserve. Our founder, an avid photographer and memory keeper, was frustrated by the lack of high-quality, customizable photo albums that truly did justice to life's special moments.
             </p>
             
             <p>
@@ -33,7 +33,7 @@ const About = () => {
             <h2 className="text-2xl font-serif font-semibold text-bloombook-800 mt-10 mb-4">Our Commitment</h2>
             
             <p>
-              At Bloombook, we're committed to quality, sustainability, and exceptional customer service. We use only the finest materials, sourced responsibly, and work with skilled artisans to create products that are built to last.
+              At BloomBook, we're committed to quality, sustainability, and exceptional customer service. We use only the finest materials, sourced responsibly, and work with skilled artisans to create products that are built to last.
             </p>
             
             <p>
