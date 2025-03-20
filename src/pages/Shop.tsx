@@ -116,10 +116,9 @@ const Shop = () => {
             <aside className="hidden md:block w-64 flex-shrink-0">
               <div className="sticky top-24">
                 <div className="bg-white rounded-lg shadow-sm border border-bloombook-100 p-6">
-                  <h2 className="font-medium text-xl text-bloombook-900 mb-6">Filter by</h2>
+                  <h2 className="font-medium text-xl text-bloombook-900 mb-6">Filter by Categories</h2>
                   
                   <div className="mb-6">
-                    <h3 className="font-medium text-lg text-bloombook-900 mb-4">Categories</h3>
                     <ul className="space-y-3">
                       <li>
                         <Link 
@@ -269,10 +268,9 @@ const Shop = () => {
               
               {isFilterOpen && (
                 <div className="mt-4 p-4 bg-white rounded-lg shadow-sm border border-bloombook-100">
-                  <h3 className="font-medium text-xl text-bloombook-900 mb-6">Filter by</h3>
+                  <h3 className="font-medium text-xl text-bloombook-900 mb-6">Filter by Categories</h3>
                 
                   <div className="mb-6">
-                    <h3 className="font-medium text-lg text-bloombook-900 mb-4">Categories</h3>
                     <div className="grid grid-cols-2 gap-2">
                       <Link 
                         to="/shop/all"
@@ -484,3 +482,4 @@ const Shop = () => {
 };
 
 export default Shop;
+
