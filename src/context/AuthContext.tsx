@@ -16,6 +16,17 @@ interface AuthContextType {
   logout: () => Promise<void>;
 }
 
+// Extended profile type to include role and address
+interface ExtendedProfile {
+  id: string;
+  full_name: string | null;
+  avatar_url: string | null;
+  phone: string | null;
+  updated_at: string | null;
+  role?: string;
+  address?: string | null;
+}
+
 // Create the context
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -44,7 +55,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               .single();
               
             if (!error && data) {
-              setIsAdmin(data.role === 'admin');
+              // Safely check if role property exists
+              const profile = data as ExtendedProfile;
+              setIsAdmin(profile.role === 'admin');
             }
           } catch (error) {
             console.error('Error checking admin status:', error);
@@ -69,7 +82,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           .single()
           .then(({ data, error }) => {
             if (!error && data) {
-              setIsAdmin(data.role === 'admin');
+              // Safely check if role property exists
+              const profile = data as ExtendedProfile;
+              setIsAdmin(profile.role === 'admin');
             }
             setLoading(false);
           });

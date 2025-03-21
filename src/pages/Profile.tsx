@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
@@ -53,13 +52,24 @@ const profileSchema = z.object({
   address: z.string().optional(),
 });
 
+// Extended profile type to include address
+interface ExtendedProfile {
+  id: string;
+  full_name: string | null;
+  avatar_url: string | null;
+  phone: string | null;
+  updated_at: string | null;
+  address?: string | null;
+  role?: string;
+}
+
 type ProfileFormValues = z.infer<typeof profileSchema>;
 
 const Profile = () => {
   const navigate = useNavigate();
   const { user, isAuthenticated, loading } = useAuth();
   const [profileLoading, setProfileLoading] = useState(true);
-  const [profile, setProfile] = useState<any>(null);
+  const [profile, setProfile] = useState<ExtendedProfile | null>(null);
   const [isSaving, setIsSaving] = useState(false);
 
   // Form
@@ -97,13 +107,14 @@ const Profile = () => {
 
       if (error) throw error;
 
-      setProfile(data);
+      // Cast to our extended profile type
+      setProfile(data as ExtendedProfile);
       
       // Set form default values
       form.reset({
         full_name: data.full_name || '',
         phone: data.phone || '',
-        address: data.address || '',
+        address: (data as ExtendedProfile).address || '',
       });
     } catch (error) {
       console.error('Error fetching profile:', error);
@@ -130,7 +141,7 @@ const Profile = () => {
       
       // Update local profile state
       setProfile({
-        ...profile,
+        ...profile!,
         full_name: data.full_name,
         phone: data.phone,
         address: data.address,

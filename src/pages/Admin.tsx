@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from "sonner";
@@ -63,13 +62,13 @@ interface Product {
   gender?: string | null;
 }
 
-// User profile type
-interface Profile {
+// Extended profile type for admin interface
+interface ExtendedProfile {
   id: string;
   full_name: string | null;
   avatar_url: string | null;
   phone: string | null;
-  role: 'admin' | 'user';
+  role?: 'admin' | 'user';
   email?: string; // Added for UI
   address?: string | null;
 }
@@ -97,14 +96,14 @@ interface CategoryDialogState {
 // State for user dialog
 interface UserDialogState {
   isOpen: boolean;
-  user: Profile | null;
+  user: ExtendedProfile | null;
 }
 
 const Admin = () => {
   const navigate = useNavigate();
   const { user, isAuthenticated, isAdmin, loading } = useAuth();
   const [products, setProducts] = useState<Product[]>([]);
-  const [users, setUsers] = useState<Profile[]>([]);
+  const [users, setUsers] = useState<ExtendedProfile[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loadingData, setLoadingData] = useState(true);
   const [productDialog, setProductDialog] = useState<ProductDialogState>({
@@ -152,9 +151,9 @@ const Admin = () => {
       if (profilesError) throw profilesError;
 
       // Get emails for profiles by fetching auth users
-      const usersWithRoles: Profile[] = profilesData.map(profile => ({
+      const usersWithRoles: ExtendedProfile[] = profilesData.map(profile => ({
         ...profile,
-        role: profile.role || 'user' // Default to 'user' if role is missing
+        role: (profile as ExtendedProfile).role || 'user' // Default to 'user' if role is missing
       }));
       
       setUsers(usersWithRoles);
@@ -366,7 +365,7 @@ const Admin = () => {
   };
 
   // User operations
-  const handleEditUser = (userProfile: Profile) => {
+  const handleEditUser = (userProfile: ExtendedProfile) => {
     setUserDialog({
       isOpen: true,
       user: userProfile

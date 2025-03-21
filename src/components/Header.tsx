@@ -1,4 +1,3 @@
-
 // Import the necessary modules and components
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
@@ -6,13 +5,13 @@ import { ShoppingCart, Menu, X, User, LogOut, ChevronRight, ShieldCheck } from '
 import { Button } from '@/components/ui/button';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
-import { useMediaQuery } from '@/hooks/use-mobile';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const Header = () => {
   const { pathname } = useLocation();
   const { totalItems } = useCart();
   const { user, isAuthenticated, isAdmin, logout } = useAuth();
-  const isMobile = useMediaQuery("(max-width: 768px)");
+  const isMobile = useIsMobile();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
 
