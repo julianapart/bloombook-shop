@@ -8,6 +8,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { toast } from 'sonner';
 import {
   Form,
   FormControl,
@@ -19,6 +20,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import { useAuth } from '@/context/AuthContext';
 
 // Form validation schemas
 const loginSchema = z.object({
@@ -46,6 +48,13 @@ const Login = () => {
   const [activeTab, setActiveTab] = useState<string>(
     location.state?.register ? 'register' : 'login'
   );
+  const { login, signUp, isAuthenticated } = useAuth();
+
+  // Redirect if already logged in
+  if (isAuthenticated) {
+    const from = location.state?.from?.pathname || '/';
+    navigate(from, { replace: true });
+  }
 
   // Login form
   const loginForm = useForm<LoginFormValues>({
@@ -70,29 +79,16 @@ const Login = () => {
   const onLoginSubmit = async (data: LoginFormValues) => {
     setIsLoading(true);
     try {
-      // Here you would typically call your authentication API
-      console.log('Login form submitted:', data);
+      await login(data.email, data.password);
       
-      // Mock login - in a real app, this would be an API call
-      setTimeout(() => {
-        // Save user info to localStorage
-        localStorage.setItem('user', JSON.stringify({ 
-          id: '123', 
-          name: 'Demo User',
-          email: data.email,
-          isAuthenticated: true 
-        }));
-        
-        // Navigate to previous page or home
-        const from = location.state?.from?.pathname || '/';
-        navigate(from, { replace: true });
-        
-        setIsLoading(false);
-        // Force a page reload to update the header with user info
-        window.location.reload();
-      }, 1000);
+      // Navigate to previous page or home
+      const from = location.state?.from?.pathname || '/';
+      navigate(from, { replace: true });
+      
+      toast.success('Successfully logged in!');
     } catch (error) {
       console.error('Login error:', error);
+    } finally {
       setIsLoading(false);
     }
   };
@@ -100,36 +96,21 @@ const Login = () => {
   const onRegisterSubmit = async (data: RegisterFormValues) => {
     setIsLoading(true);
     try {
-      // Here you would typically call your registration API
-      console.log('Register form submitted:', data);
+      await signUp(data.email, data.password, data.name);
       
-      // Mock registration - in a real app, this would be an API call
-      setTimeout(() => {
-        // Save user info to localStorage
-        localStorage.setItem('user', JSON.stringify({ 
-          id: '456', 
-          name: data.name,
-          email: data.email,
-          isAuthenticated: true 
-        }));
-        
-        // Navigate to home page
-        navigate('/', { replace: true });
-        
-        setIsLoading(false);
-        // Force a page reload to update the header with user info
-        window.location.reload();
-      }, 1000);
+      // Switch to login tab after successful registration
+      setActiveTab('login');
+      
     } catch (error) {
       console.error('Registration error:', error);
+    } finally {
       setIsLoading(false);
     }
   };
 
   const handleGoogleLogin = () => {
     // In a real app, this would redirect to Google OAuth
-    console.log('Google login clicked');
-    alert('Google login would be implemented here');
+    toast.error('Google login not implemented yet');
   };
 
   return (

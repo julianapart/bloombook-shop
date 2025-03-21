@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -21,12 +22,11 @@ import { Separator } from '@/components/ui/separator';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { useAuth } from '@/context/AuthContext';
+import { supabase } from '@/integrations/supabase/client';
 
 // Define the form schema
 const profileFormSchema = z.object({
-  name: z.string().min(2, { message: "Name must be at least 2 characters." }),
-  email: z.string().email({ message: "Invalid email address." }).optional(),
-  // Add other fields as needed
+  full_name: z.string().min(2, { message: "Name must be at least 2 characters." }),
   phone: z.string().optional(),
   address: z.string().optional(),
 });
@@ -35,15 +35,16 @@ type ProfileFormValues = z.infer<typeof profileFormSchema>;
 
 const Profile = () => {
   const navigate = useNavigate();
-  const { user, isAuthenticated, loading, login } = useAuth();
+  const { user, isAuthenticated, loading, logout } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [profileData, setProfileData] = useState<any>(null);
+  const [loadingProfile, setLoadingProfile] = useState(true);
 
   // Initialize form
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema),
     defaultValues: {
-      name: user?.name || "",
-      email: user?.email || "",
+      full_name: "",
       phone: "",
       address: "",
     },
@@ -55,42 +56,83 @@ const Profile = () => {
       navigate('/login', { state: { from: { pathname: '/profile' } } });
     }
 
-    // Update form values when user data is loaded
-    if (user) {
-      form.reset({
-        name: user.name,
-        email: user.email,
-        // Initialize other fields from user data when available
-        phone: "",
-        address: "",
-      });
+    // Fetch profile data from Supabase
+    if (isAuthenticated && user) {
+      fetchProfileData();
     }
-  }, [isAuthenticated, loading, navigate, user, form]);
+  }, [isAuthenticated, loading, navigate, user]);
+
+  const fetchProfileData = async () => {
+    if (!user) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
+
+      if (error) throw error;
+
+      setProfileData(data);
+      
+      // Update form values with fetched data
+      form.reset({
+        full_name: data.full_name || "",
+        phone: data.phone || "",
+        address: data.address || "",
+      });
+    } catch (error) {
+      console.error('Error fetching profile:', error);
+      toast.error('Failed to load profile data');
+    } finally {
+      setLoadingProfile(false);
+    }
+  };
 
   // Handle form submission
   const onSubmit = async (data: ProfileFormValues) => {
+    if (!user) return;
+    
     setIsSubmitting(true);
     try {
-      // Keep the email from the existing user data
-      const updatedUser = {
-        ...user!,
-        name: data.name,
-        // Update other fields but not email
-      };
+      const { error } = await supabase
+        .from('profiles')
+        .update({
+          full_name: data.full_name,
+          phone: data.phone,
+          address: data.address,
+        })
+        .eq('id', user.id);
 
-      // Update user in local storage (in a real app, this would be an API call)
-      login(updatedUser);
+      if (error) throw error;
+      
+      // Update local state
+      setProfileData({
+        ...profileData,
+        full_name: data.full_name,
+        phone: data.phone,
+        address: data.address,
+      });
       
       toast.success("Profile updated successfully");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to update profile:", error);
-      toast.error("Failed to update profile");
+      toast.error(error.message || "Failed to update profile");
     } finally {
       setIsSubmitting(false);
     }
   };
 
-  if (loading) {
+  const handleLogout = async () => {
+    try {
+      await logout();
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+  };
+
+  if (loading || loadingProfile) {
     return (
       <div className="min-h-screen flex flex-col">
         <Header />
@@ -119,7 +161,7 @@ const Profile = () => {
                 <CardHeader>
                   <CardTitle>Profile Information</CardTitle>
                   <CardDescription>
-                    Update your personal information. Your email address cannot be changed.
+                    Update your personal information.
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -127,30 +169,13 @@ const Profile = () => {
                     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                       <FormField
                         control={form.control}
-                        name="name"
+                        name="full_name"
                         render={({ field }) => (
                           <FormItem>
                             <FormLabel>Full Name</FormLabel>
                             <FormControl>
                               <Input {...field} />
                             </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      
-                      <FormField
-                        control={form.control}
-                        name="email"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Email Address</FormLabel>
-                            <FormControl>
-                              <Input {...field} disabled className="bg-gray-100" />
-                            </FormControl>
-                            <FormDescription>
-                              Your email address cannot be changed.
-                            </FormDescription>
                             <FormMessage />
                           </FormItem>
                         )}
@@ -223,6 +248,7 @@ const Profile = () => {
                   <Button 
                     variant="destructive" 
                     className="w-full"
+                    onClick={handleLogout}
                   >
                     Sign Out
                   </Button>
