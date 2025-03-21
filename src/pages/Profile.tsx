@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
@@ -8,7 +9,8 @@ import {
   Camera, 
   ShoppingBag, 
   Settings,
-  Save
+  Save,
+  Shield
 } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -31,6 +33,7 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
+  CardFooter,
 } from '@/components/ui/card';
 import {
   Tabs,
@@ -44,6 +47,17 @@ import { supabase } from '@/integrations/supabase/client';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Separator } from "@/components/ui/separator";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 // Form schema
 const profileSchema = z.object({
@@ -67,10 +81,11 @@ type ProfileFormValues = z.infer<typeof profileSchema>;
 
 const Profile = () => {
   const navigate = useNavigate();
-  const { user, isAuthenticated, loading } = useAuth();
+  const { user, isAuthenticated, loading, isAdmin } = useAuth();
   const [profileLoading, setProfileLoading] = useState(true);
   const [profile, setProfile] = useState<ExtendedProfile | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [isPromotingToAdmin, setIsPromotingToAdmin] = useState(false);
 
   // Form
   const form = useForm<ProfileFormValues>({
@@ -156,6 +171,34 @@ const Profile = () => {
     }
   };
 
+  const promoteToAdmin = async () => {
+    if (!user) return;
+    
+    try {
+      setIsPromotingToAdmin(true);
+      
+      const { error } = await supabase
+        .from('profiles')
+        .update({ role: 'admin' })
+        .eq('id', user.id);
+      
+      if (error) throw error;
+      
+      // Update local profile state
+      setProfile({
+        ...profile!,
+        role: 'admin',
+      });
+      
+      toast.success('You are now an admin! Please refresh the page or log out and log back in to see admin features.');
+    } catch (error: any) {
+      console.error('Error promoting to admin:', error);
+      toast.error(error.error_description || error.message || 'Failed to promote to admin');
+    } finally {
+      setIsPromotingToAdmin(false);
+    }
+  };
+
   const getInitials = (name: string) => {
     return name
       ?.split(' ')
@@ -212,6 +255,14 @@ const Profile = () => {
                       {user?.email}
                     </p>
                     
+                    {/* Admin status */}
+                    {profile?.role === 'admin' && (
+                      <div className="mt-2 flex items-center justify-center bg-green-50 text-green-700 rounded-full px-3 py-1 text-xs font-medium">
+                        <Shield className="h-3 w-3 mr-1" />
+                        Admin
+                      </div>
+                    )}
+                    
                     <Separator className="my-4" />
                     
                     <div className="w-full mt-2 space-y-3">
@@ -235,10 +286,67 @@ const Profile = () => {
                           Account Settings
                         </span>
                       </Button>
+                      {isAdmin && (
+                        <Button
+                          variant="default"
+                          className="w-full justify-start bg-bloombook-600 hover:bg-bloombook-700"
+                          onClick={() => navigate('/admin')}
+                        >
+                          <Shield className="h-4 w-4 mr-2" />
+                          Admin Dashboard
+                        </Button>
+                      )}
                     </div>
                   </div>
                 </CardContent>
               </Card>
+              
+              {/* Admin Promotion Card */}
+              {profile?.role !== 'admin' && (
+                <Card className="mt-4 border-dashed border-2 border-gray-300">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-base flex items-center">
+                      <Shield className="h-4 w-4 mr-2" />
+                      Admin Access
+                    </CardTitle>
+                    <CardDescription className="text-xs">
+                      Gain admin privileges for your account
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="pt-0 pb-4">
+                    <p className="text-sm mb-4">
+                      Promoting yourself to admin will give you access to the admin dashboard to manage products, categories, and users.
+                    </p>
+                    
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className="w-full"
+                          disabled={isPromotingToAdmin}
+                        >
+                          <Shield className="h-4 w-4 mr-2" />
+                          {isPromotingToAdmin ? 'Processing...' : 'Become Admin'}
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Become an Admin?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            This will grant your account admin privileges. With great power comes great responsibility. Are you sure you want to proceed?
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction onClick={promoteToAdmin}>
+                            Confirm
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </CardContent>
+                </Card>
+              )}
             </div>
             
             {/* Main content */}
