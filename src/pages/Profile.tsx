@@ -10,7 +10,8 @@ import {
   ShoppingBag, 
   Settings,
   Save,
-  Shield
+  Shield,
+  AlertTriangle
 } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -83,6 +84,7 @@ const Profile = () => {
   const navigate = useNavigate();
   const { user, isAuthenticated, loading, isAdmin } = useAuth();
   const [profileLoading, setProfileLoading] = useState(true);
+  const [profileError, setProfileError] = useState<string | null>(null);
   const [profile, setProfile] = useState<ExtendedProfile | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [isPromotingToAdmin, setIsPromotingToAdmin] = useState(false);
@@ -114,14 +116,24 @@ const Profile = () => {
   const fetchProfile = async () => {
     try {
       setProfileLoading(true);
+      setProfileError(null);
+      
+      console.log("Fetching profile for user ID:", user?.id);
+      
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', user?.id)
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching profile:', error);
+        setProfileError(error.message);
+        throw error;
+      }
 
+      console.log("Profile data retrieved:", data);
+      
       // Cast to our extended profile type
       setProfile(data as ExtendedProfile);
       
@@ -207,12 +219,67 @@ const Profile = () => {
       .toUpperCase() || 'U';
   };
 
-  if (loading || profileLoading) {
+  if (loading) {
     return (
       <div className="min-h-screen flex flex-col">
         <Header />
         <div className="flex-grow flex items-center justify-center">
-          <div className="animate-pulse">Loading...</div>
+          <div className="animate-pulse">Loading authentication status...</div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  // If not authenticated, we'll redirect in the useEffect
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <div className="flex-grow flex flex-col items-center justify-center">
+          <AlertTriangle className="h-12 w-12 text-yellow-500 mb-4" />
+          <h2 className="text-2xl font-medium mb-2">Authentication Required</h2>
+          <p className="text-gray-600 mb-6">Please sign in to view your profile</p>
+          <Button onClick={() => navigate('/login')} className="bg-bloombook-600 hover:bg-bloombook-700">
+            Sign In
+          </Button>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (profileError) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <div className="flex-grow flex flex-col items-center justify-center p-4">
+          <AlertTriangle className="h-12 w-12 text-red-500 mb-4" />
+          <h2 className="text-2xl font-medium mb-2">Error Loading Profile</h2>
+          <p className="text-gray-600 mb-6 text-center">{profileError}</p>
+          <p className="text-gray-600 mb-6 text-center">
+            You might need to sign up for an account first or check if you're already registered.
+          </p>
+          <div className="flex space-x-4">
+            <Button onClick={() => navigate('/login')} variant="outline">
+              Sign In
+            </Button>
+            <Button onClick={() => navigate('/login', { state: { register: true } })} className="bg-bloombook-600 hover:bg-bloombook-700">
+              Sign Up
+            </Button>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (profileLoading) {
+    return (
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <div className="flex-grow flex items-center justify-center">
+          <div className="animate-pulse">Loading profile data...</div>
         </div>
         <Footer />
       </div>

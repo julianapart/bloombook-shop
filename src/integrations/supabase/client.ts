@@ -6,6 +6,9 @@ import type { Database } from './types';
 const SUPABASE_URL = "https://xqqizxdgulmuhzdqwmyn.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhxcWl6eGRndWxtdWh6ZHF3bXluIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDI0NzUzNDQsImV4cCI6MjA1ODA1MTM0NH0.G8IBD7d-4gU2ApnL07Z2Hn1AISCAP9s71crJcsSbLyM";
 
+// Get site URL dynamically
+const siteUrl = window.location.origin;
+
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
 
@@ -14,5 +17,12 @@ export const supabase = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABL
     storage: localStorage,
     persistSession: true,
     autoRefreshToken: true,
+    detectSessionInUrl: true,
+    flowType: 'pkce',
+    // Set site URL to ensure proper redirects
+    site: siteUrl
   }
 });
+
+// Log for debugging
+console.log(`Supabase client initialized with site URL: ${siteUrl}`);

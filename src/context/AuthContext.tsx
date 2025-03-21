@@ -39,9 +39,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   // Check auth status and set up listener on mount
   useEffect(() => {
+    console.log("Setting up auth state change listener");
+    
     // Set up auth state change listener first
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        console.log("Auth state changed:", event, session?.user?.email);
         setSession(session);
         setUser(session?.user ?? null);
         
@@ -54,13 +57,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               .eq('id', session.user.id)
               .single();
               
-            if (!error && data) {
+            if (error) {
+              console.error('Error checking admin status:', error);
+              setIsAdmin(false);
+            } else if (data) {
               // Safely check if role property exists
               const profile = data as ExtendedProfile;
               setIsAdmin(profile.role === 'admin');
+              console.log("User profile loaded:", profile);
             }
           } catch (error) {
             console.error('Error checking admin status:', error);
+            setIsAdmin(false);
           }
         } else {
           setIsAdmin(false);
@@ -70,6 +78,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     // Then check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
+      console.log("Existing session check:", session?.user?.email);
       setSession(session);
       setUser(session?.user ?? null);
       
@@ -81,10 +90,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           .eq('id', session.user.id)
           .single()
           .then(({ data, error }) => {
-            if (!error && data) {
+            if (error) {
+              console.error('Error checking admin status:', error);
+              setIsAdmin(false);
+            } else if (data) {
               // Safely check if role property exists
               const profile = data as ExtendedProfile;
               setIsAdmin(profile.role === 'admin');
+              console.log("User profile loaded:", profile);
             }
             setLoading(false);
           });
@@ -101,12 +114,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   // Login function
   const login = async (email: string, password: string) => {
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      console.log("Attempting login for:", email);
+      const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Login error:", error.message);
+        throw error;
+      }
+      
+      console.log("Login successful for:", data.user?.email);
     } catch (error: any) {
       toast.error(error.message || 'Failed to log in');
       throw error;
@@ -116,7 +135,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   // Sign up function
   const signUp = async (email: string, password: string, name: string) => {
     try {
-      const { error } = await supabase.auth.signUp({
+      console.log("Attempting signup for:", email);
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -126,8 +146,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         },
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Signup error:", error.message);
+        throw error;
+      }
       
+      console.log("Signup response:", data);
       toast.success('Signup successful! Please check your email to confirm your account.');
     } catch (error: any) {
       toast.error(error.message || 'Failed to sign up');
