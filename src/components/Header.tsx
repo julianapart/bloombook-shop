@@ -1,386 +1,272 @@
+
+// Import the necessary modules and components
 import { useState, useEffect } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Search, ShoppingCart, User, LogOut, Menu, X } from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { useAuth } from '@/context/AuthContext';
+import { Link, useLocation } from 'react-router-dom';
+import { ShoppingCart, Menu, X, User, LogOut, ChevronRight, ShieldCheck } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { useCart } from '@/context/CartContext';
-import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-} from "@/components/ui/navigation-menu";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
-  Sheet,
-  SheetContent,
-  SheetTrigger,
-  SheetClose,
-} from "@/components/ui/sheet";
+import { useAuth } from '@/context/AuthContext';
+import { useMediaQuery } from '@/hooks/use-mobile';
 
 const Header = () => {
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const location = useLocation();
-  const navigate = useNavigate();
-  const { isAuthenticated, user, logout } = useAuth();
+  const { pathname } = useLocation();
   const { totalItems } = useCart();
+  const { user, isAuthenticated, isAdmin, logout } = useAuth();
+  const isMobile = useMediaQuery("(max-width: 768px)");
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
 
+  // Close menus when clicking outside or navigating
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
+    const handleClickOutside = (event: MouseEvent) => {
+      if (isMenuOpen || isProfileMenuOpen) {
+        const target = event.target as HTMLElement;
+        // Check if the click is outside the menu
+        if (!target.closest('.mobile-menu') && !target.closest('.profile-menu-button')) {
+          setIsMenuOpen(false);
+          setIsProfileMenuOpen(false);
+        }
+      }
     };
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, [isMenuOpen, isProfileMenuOpen]);
 
-  const handleSearchSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log('Search for:', searchQuery);
+  // Close menus on navigation
+  useEffect(() => {
+    setIsMenuOpen(false);
+    setIsProfileMenuOpen(false);
+  }, [pathname]);
+
+  const toggleMenu = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsMenuOpen(!isMenuOpen);
+    if (isProfileMenuOpen) setIsProfileMenuOpen(false);
   };
 
-  const handleCartClick = (e: React.MouseEvent) => {
-    if (!isAuthenticated) {
-      e.preventDefault();
-      navigate('/login', { state: { from: { pathname: '/cart' } } });
-    }
+  const toggleProfileMenu = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsProfileMenuOpen(!isProfileMenuOpen);
+    if (isMenuOpen) setIsMenuOpen(false);
   };
+
+  // Handle logout
+  const handleLogout = async () => {
+    await logout();
+    setIsProfileMenuOpen(false);
+  };
+
+  // Navigation links
+  const navLinks = [
+    { to: '/', label: 'Home' },
+    { to: '/shop', label: 'Shop' },
+    { to: '/about', label: 'About' },
+    { to: '/contact', label: 'Contact' }
+  ];
 
   return (
-    <header className={cn(
-      'header-fixed py-4 px-6 md:px-10 transition-all duration-300 ease-in-out',
-      isScrolled ? 'header-scrolled' : 'bg-transparent'
-    )}>
-      <div className="container mx-auto">
-        <div className="flex items-center justify-between">
-          <Link to="/" className="font-serif text-2xl font-semibold text-bloombook-900 transition-all hover:opacity-80">
-            BloomBook
-          </Link>
+    <header className="bg-white border-b border-bloombook-100 py-4">
+      <div className="container mx-auto px-4 flex items-center justify-between">
+        {/* Logo and brand name */}
+        <Link to="/" className="flex items-center">
+          <span className="font-serif text-2xl font-medium text-bloombook-900">Bloom<span className="text-bloombook-600">Book</span></span>
+        </Link>
 
-          <div className="hidden md:flex flex-1 justify-center">
-            <nav className="flex items-center w-full max-w-md justify-center">
-              <NavigationMenu className="mx-auto">
-                <NavigationMenuList className="space-x-12">
-                  <NavigationMenuItem>
-                    <NavigationMenuTrigger className={cn("header-link", location.pathname.includes("/shop") && "text-bloombook-600")}>
-                      Shop
-                    </NavigationMenuTrigger>
-                    <NavigationMenuContent>
-                      <ul className="grid gap-3 p-4 w-[200px]">
-                        <li className="row-span-3">
-                          <NavigationMenuLink asChild>
-                            <Link 
-                              to="/shop/all" 
-                              className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-bloombook-100 to-bloombook-200 p-4 no-underline outline-none focus:shadow-md"
-                            >
-                              <div className="text-lg font-medium text-bloombook-900">All Products</div>
-                              <p className="text-sm text-bloombook-600">Browse our entire collection</p>
-                            </Link>
-                          </NavigationMenuLink>
-                        </li>
-                        <li>
-                          <Link 
-                            to="/shop/photo-albums" 
-                            className="block select-none space-y-1 rounded-md p-3 hover:bg-bloombook-100 transition-colors"
-                          >
-                            <div className="text-sm font-medium text-bloombook-900">Photo Albums</div>
-                          </Link>
-                        </li>
-                        <li>
-                          <Link 
-                            to="/shop/digital-products" 
-                            className="block select-none space-y-1 rounded-md p-3 hover:bg-bloombook-100 transition-colors"
-                          >
-                            <div className="text-sm font-medium text-bloombook-900">Digital Products</div>
-                          </Link>
-                        </li>
-                        <li>
-                          <Link 
-                            to="/shop/cards" 
-                            className="block select-none space-y-1 rounded-md p-3 hover:bg-bloombook-100 transition-colors"
-                          >
-                            <div className="text-sm font-medium text-bloombook-900">Post Cards</div>
-                          </Link>
-                        </li>
-                      </ul>
-                    </NavigationMenuContent>
-                  </NavigationMenuItem>
-                  <NavigationMenuItem>
-                    <Link 
-                      to="/about" 
-                      className={cn("header-link px-4 py-2", location.pathname === "/about" && "text-bloombook-600")}
-                    >
-                      About
-                    </Link>
-                  </NavigationMenuItem>
-                  <NavigationMenuItem>
-                    <Link 
-                      to="/contact" 
-                      className={cn("header-link px-4 py-2", location.pathname === "/contact" && "text-bloombook-600")}
-                    >
-                      Contact
-                    </Link>
-                  </NavigationMenuItem>
-                </NavigationMenuList>
-              </NavigationMenu>
-            </nav>
-          </div>
-
-          <div className="flex items-center space-x-2 md:space-x-4">
-            <form onSubmit={handleSearchSubmit} className="relative hidden md:block">
-              <input
-                type="text"
-                placeholder="Search"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-[180px] lg:w-[240px] py-2 px-4 pr-10 rounded-full border border-bloombook-200 bg-white/70 focus:bg-white focus:outline-none focus:ring-1 focus:ring-bloombook-500 text-sm placeholder:text-bloombook-400 transition-all"
-              />
-              <button 
-                type="submit" 
-                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-bloombook-400 hover:text-bloombook-700"
-              >
-                <Search size={18} />
-              </button>
-            </form>
-            
-            {isAuthenticated ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger className="relative p-2 rounded-full hover:bg-bloombook-100 transition-colors">
-                  <User size={20} className="text-bloombook-700" />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuLabel>
-                    <div className="flex flex-col">
-                      <span className="font-medium">{user?.name}</span>
-                      <span className="text-xs text-muted-foreground">{user?.email}</span>
-                    </div>
-                  </DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem asChild>
-                    <Link to="/profile">Profile</Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link to="/orders">Orders</Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem asChild>
-                    <Link to="/wishlist">Wishlist</Link>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={logout} className="text-red-500 cursor-pointer">
-                    <LogOut className="mr-2 h-4 w-4" />
-                    <span>Logout</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            ) : (
-              <Link to="/login" className="relative p-2 rounded-full hover:bg-bloombook-100 transition-colors">
-                <User size={20} className="text-bloombook-700" />
-              </Link>
-            )}
-            
-            <Link 
-              to={isAuthenticated ? "/cart" : "#"} 
-              className="relative p-2 rounded-full hover:bg-bloombook-100 transition-colors"
-              onClick={handleCartClick}
+        {/* Desktop navigation */}
+        <nav className="hidden md:flex space-x-6">
+          {navLinks.map((link) => (
+            <Link
+              key={link.to}
+              to={link.to}
+              className={`text-sm font-medium transition-colors ${
+                pathname === link.to
+                  ? 'text-bloombook-900 border-b-2 border-bloombook-600 pb-1'
+                  : 'text-bloombook-600 hover:text-bloombook-900'
+              }`}
             >
-              <ShoppingCart size={20} className="text-bloombook-700" />
-              {isAuthenticated && totalItems > 0 && (
-                <span className="absolute top-0 right-0 inline-flex items-center justify-center w-4 h-4 text-xs font-bold text-white bg-bloombook-600 rounded-full">
-                  {totalItems}
-                </span>
-              )}
+              {link.label}
             </Link>
+          ))}
+        </nav>
 
-            <Sheet>
-              <SheetTrigger className="md:hidden p-2 rounded-full hover:bg-bloombook-100 transition-colors">
-                <Menu size={20} className="text-bloombook-700" />
-              </SheetTrigger>
-              <SheetContent side="right" className="w-[280px] sm:w-[350px]">
-                <div className="py-4 flex flex-col h-full">
-                  <div className="mb-8">
-                    <Link to="/" className="font-serif text-xl font-semibold text-bloombook-900 hover:text-bloombook-700">
-                      BloomBook
-                    </Link>
+        {/* Desktop actions */}
+        <div className="hidden md:flex items-center space-x-4">
+          {isAuthenticated ? (
+            <div className="relative">
+              <Button
+                variant="ghost"
+                size="sm" 
+                className="flex items-center gap-2 text-bloombook-700 profile-menu-button"
+                onClick={toggleProfileMenu}
+              >
+                <User className="h-4 w-4" />
+                <span>{user?.user_metadata?.full_name || 'Account'}</span>
+              </Button>
+              
+              {isProfileMenuOpen && (
+                <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50">
+                  <div className="p-4 text-sm text-bloombook-900 border-b border-bloombook-100">
+                    <p className="font-medium">
+                      {user?.user_metadata?.full_name || 'User'}
+                    </p>
+                    <p className="text-xs text-bloombook-500 mt-1 truncate">
+                      {user?.email}
+                    </p>
                   </div>
-
-                  <form onSubmit={handleSearchSubmit} className="relative mb-6">
-                    <input
-                      type="text"
-                      placeholder="Search"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full py-2 px-4 pr-10 rounded-full border border-bloombook-200 bg-white focus:outline-none focus:ring-1 focus:ring-bloombook-500 text-sm placeholder:text-bloombook-400"
-                    />
-                    <button 
-                      type="submit" 
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-bloombook-400 hover:text-bloombook-700"
+                  <div className="py-1">
+                    <Link
+                      to="/profile"
+                      className="block px-4 py-2 text-sm text-bloombook-700 hover:bg-bloombook-50 flex items-center"
                     >
-                      <Search size={18} />
-                    </button>
-                  </form>
-
-                  <nav className="flex-1">
-                    <ul className="space-y-4">
-                      <li>
-                        <SheetClose asChild>
-                          <Link 
-                            to="/shop/all"
-                            className={cn(
-                              "block p-2 rounded-md hover:bg-bloombook-50",
-                              location.pathname.includes("/shop") && "text-bloombook-600 bg-bloombook-50"
-                            )}
-                          >
-                            Shop
-                          </Link>
-                        </SheetClose>
-                        <ul className="pl-4 mt-2 space-y-2 border-l border-bloombook-100">
-                          <li>
-                            <SheetClose asChild>
-                              <Link 
-                                to="/shop/all"
-                                className="block p-2 text-sm rounded-md hover:bg-bloombook-50"
-                              >
-                                All Products
-                              </Link>
-                            </SheetClose>
-                          </li>
-                          <li>
-                            <SheetClose asChild>
-                              <Link 
-                                to="/shop/photo-albums"
-                                className="block p-2 text-sm rounded-md hover:bg-bloombook-50"
-                              >
-                                Photo Albums
-                              </Link>
-                            </SheetClose>
-                          </li>
-                          <li>
-                            <SheetClose asChild>
-                              <Link 
-                                to="/shop/digital-products"
-                                className="block p-2 text-sm rounded-md hover:bg-bloombook-50"
-                              >
-                                Digital Products
-                              </Link>
-                            </SheetClose>
-                          </li>
-                          <li>
-                            <SheetClose asChild>
-                              <Link 
-                                to="/shop/cards"
-                                className="block p-2 text-sm rounded-md hover:bg-bloombook-50"
-                              >
-                                Post Cards
-                              </Link>
-                            </SheetClose>
-                          </li>
-                        </ul>
-                      </li>
-                      <li>
-                        <SheetClose asChild>
-                          <Link 
-                            to="/about"
-                            className={cn(
-                              "block p-2 rounded-md hover:bg-bloombook-50",
-                              location.pathname === "/about" && "text-bloombook-600 bg-bloombook-50"
-                            )}
-                          >
-                            About
-                          </Link>
-                        </SheetClose>
-                      </li>
-                      <li>
-                        <SheetClose asChild>
-                          <Link 
-                            to="/contact"
-                            className={cn(
-                              "block p-2 rounded-md hover:bg-bloombook-50",
-                              location.pathname === "/contact" && "text-bloombook-600 bg-bloombook-50"
-                            )}
-                          >
-                            Contact
-                          </Link>
-                        </SheetClose>
-                      </li>
-                    </ul>
-                  </nav>
-
-                  <div className="pt-6 border-t border-bloombook-100 mt-auto">
-                    {isAuthenticated ? (
-                      <div className="space-y-4">
-                        <div className="flex items-center">
-                          <div className="w-8 h-8 rounded-full bg-bloombook-100 flex items-center justify-center mr-3">
-                            <User size={16} className="text-bloombook-700" />
-                          </div>
-                          <div>
-                            <p className="text-sm font-medium">{user?.name}</p>
-                            <p className="text-xs text-bloombook-500">{user?.email}</p>
-                          </div>
-                        </div>
-                        <SheetClose asChild>
-                          <Link 
-                            to="/cart"
-                            className="flex items-center p-2 text-sm rounded-md hover:bg-bloombook-50"
-                          >
-                            <ShoppingCart size={16} className="mr-3 text-bloombook-700" />
-                            My Cart ({totalItems})
-                          </Link>
-                        </SheetClose>
-                        <SheetClose asChild>
-                          <Link 
-                            to="/profile"
-                            className="flex items-center p-2 text-sm rounded-md hover:bg-bloombook-50"
-                          >
-                            <User size={16} className="mr-3 text-bloombook-700" />
-                            My Profile
-                          </Link>
-                        </SheetClose>
-                        <button 
-                          onClick={logout}
-                          className="flex items-center p-2 text-sm rounded-md text-red-500 hover:bg-red-50 w-full text-left"
-                        >
-                          <LogOut size={16} className="mr-3" />
-                          Logout
-                        </button>
-                      </div>
-                    ) : (
-                      <div className="space-y-3">
-                        <SheetClose asChild>
-                          <Link 
-                            to="/login"
-                            className="block w-full py-2 px-4 text-center bg-bloombook-600 hover:bg-bloombook-700 text-white rounded-md transition-colors"
-                          >
-                            Login
-                          </Link>
-                        </SheetClose>
-                        <SheetClose asChild>
-                          <Link 
-                            to="/login"
-                            state={{ register: true }}
-                            className="block w-full py-2 px-4 text-center border border-bloombook-200 hover:bg-bloombook-50 rounded-md transition-colors"
-                          >
-                            Create Account
-                          </Link>
-                        </SheetClose>
-                      </div>
+                      <User className="h-4 w-4 mr-2" />
+                      Profile
+                      <ChevronRight className="h-4 w-4 ml-auto" />
+                    </Link>
+                    {isAdmin && (
+                      <Link
+                        to="/admin"
+                        className="block px-4 py-2 text-sm text-bloombook-700 hover:bg-bloombook-50 flex items-center"
+                      >
+                        <ShieldCheck className="h-4 w-4 mr-2" />
+                        Admin Panel
+                        <ChevronRight className="h-4 w-4 ml-auto" />
+                      </Link>
                     )}
+                    <button
+                      onClick={handleLogout}
+                      className="block w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center"
+                    >
+                      <LogOut className="h-4 w-4 mr-2" />
+                      Sign Out
+                    </button>
                   </div>
                 </div>
-              </SheetContent>
-            </Sheet>
-          </div>
+              )}
+            </div>
+          ) : (
+            <Button asChild variant="default" size="sm" className="bg-bloombook-600 hover:bg-bloombook-700">
+              <Link to="/login">Sign In</Link>
+            </Button>
+          )}
+
+          <Link to="/cart" className="relative p-2 text-bloombook-700 hover:text-bloombook-900 transition-colors">
+            <ShoppingCart className="h-5 w-5" />
+            {totalItems > 0 && (
+              <span className="absolute -top-1 -right-1 bg-bloombook-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                {totalItems}
+              </span>
+            )}
+          </Link>
+        </div>
+
+        {/* Mobile menu button */}
+        <div className="flex md:hidden items-center space-x-3">
+          <Link to="/cart" className="relative p-2 text-bloombook-700 hover:text-bloombook-900 transition-colors">
+            <ShoppingCart className="h-5 w-5" />
+            {totalItems > 0 && (
+              <span className="absolute -top-1 -right-1 bg-bloombook-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                {totalItems}
+              </span>
+            )}
+          </Link>
+          <button
+            className="text-bloombook-700 p-2"
+            onClick={toggleMenu}
+            aria-label="Menu"
+          >
+            {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          </button>
         </div>
       </div>
+
+      {/* Mobile menu */}
+      {isMobile && isMenuOpen && (
+        <div className="fixed inset-0 z-50 bg-white mobile-menu" onClick={(e) => e.stopPropagation()}>
+          <div className="container mx-auto px-4 py-4 flex flex-col h-full">
+            <div className="flex justify-between items-center mb-8">
+              <Link to="/" className="flex items-center" onClick={() => setIsMenuOpen(false)}>
+                <span className="font-serif text-2xl font-medium text-bloombook-900">Bloom<span className="text-bloombook-600">Book</span></span>
+              </Link>
+              <button
+                className="text-bloombook-700 p-2"
+                onClick={toggleMenu}
+                aria-label="Close Menu"
+              >
+                <X className="h-6 w-6" />
+              </button>
+            </div>
+
+            <div className="flex-1 flex flex-col">
+              <nav className="flex flex-col space-y-4 mb-8">
+                {navLinks.map((link) => (
+                  <Link
+                    key={link.to}
+                    to={link.to}
+                    className={`text-base py-2 font-medium transition-colors ${
+                      pathname === link.to
+                        ? 'text-bloombook-900 border-b-2 border-bloombook-600'
+                        : 'text-bloombook-600 hover:text-bloombook-900'
+                    }`}
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+              </nav>
+
+              {isAuthenticated ? (
+                <div className="border-t border-bloombook-100 pt-6">
+                  <div className="mb-4">
+                    <p className="text-sm text-bloombook-500">Signed in as</p>
+                    <p className="font-medium text-bloombook-900">{user?.user_metadata?.full_name || 'User'}</p>
+                    <p className="text-sm text-bloombook-500 truncate">{user?.email}</p>
+                  </div>
+                  
+                  <div className="space-y-3">
+                    <Button asChild variant="outline" size="sm" className="w-full justify-start">
+                      <Link to="/profile">
+                        <User className="h-4 w-4 mr-2" />
+                        Profile
+                      </Link>
+                    </Button>
+                    
+                    {isAdmin && (
+                      <Button asChild variant="outline" size="sm" className="w-full justify-start">
+                        <Link to="/admin">
+                          <ShieldCheck className="h-4 w-4 mr-2" />
+                          Admin Panel
+                        </Link>
+                      </Button>
+                    )}
+                    
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50 border-red-100"
+                      onClick={handleLogout}
+                    >
+                      <LogOut className="h-4 w-4 mr-2" />
+                      Sign Out
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <div className="mt-auto border-t border-bloombook-100 pt-6">
+                  <Button asChild variant="default" size="lg" className="w-full bg-bloombook-600 hover:bg-bloombook-700">
+                    <Link to="/login">Sign In</Link>
+                  </Button>
+                  <p className="text-center text-sm text-bloombook-500 mt-4">
+                    Don't have an account?{' '}
+                    <Link to="/login" className="text-bloombook-700 hover:text-bloombook-900" state={{ register: true }}>
+                      Sign Up
+                    </Link>
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </header>
   );
 };

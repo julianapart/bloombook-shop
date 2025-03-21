@@ -39,7 +39,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           try {
             const { data, error } = await supabase
               .from('profiles')
-              .select('role')
+              .select('*')
               .eq('id', session.user.id)
               .single();
               
@@ -64,7 +64,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         // Check if user is admin
         supabase
           .from('profiles')
-          .select('role')
+          .select('*')
           .eq('id', session.user.id)
           .single()
           .then(({ data, error }) => {
