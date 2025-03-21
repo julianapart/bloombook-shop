@@ -62,7 +62,7 @@ const Cart = () => {
       <main className="flex-grow">
         <div className="container mx-auto px-4 py-8 md:py-12">
           <div className="mb-6">
-            <Link to="/" className="inline-flex items-center text-bloombook-600 hover:text-bloombook-800 transition-colors">
+            <Link to="/shop/all" className="inline-flex items-center text-bloombook-600 hover:text-bloombook-800 transition-colors">
               <ArrowLeft size={16} className="mr-2" />
               Continue Shopping
             </Link>
