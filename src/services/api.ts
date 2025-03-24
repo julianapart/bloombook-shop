@@ -118,7 +118,7 @@ export const categoryService = {
       return [];
     }
     
-    return (data as Category[] || []);
+    return (data as Category[]) || [];
   },
   
   async getById(id: string): Promise<Category | null> {
@@ -138,7 +138,7 @@ export const categoryService = {
     
     // Handle possible array or single object response
     if (Array.isArray(data)) {
-      return data.length > 0 ? data[0] as Category : null;
+      return data.length > 0 ? (data[0] as Category) : null;
     }
     
     return data as Category;
@@ -166,7 +166,7 @@ export const categoryService = {
     
     // Handle possible array or single object response
     if (Array.isArray(data)) {
-      return data.length > 0 ? data[0] as Category : null;
+      return data.length > 0 ? (data[0] as Category) : null;
     }
     
     return data as Category;
@@ -195,7 +195,7 @@ export const categoryService = {
     
     // Handle possible array or single object response
     if (Array.isArray(data)) {
-      return data.length > 0 ? data[0] as Category : null;
+      return data.length > 0 ? (data[0] as Category) : null;
     }
     
     return data as Category;
