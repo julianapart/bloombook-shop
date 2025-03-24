@@ -1,4 +1,5 @@
-import { supabase, toast } from './base';
+
+import { supabase, toast } from './services/base';
 import type { Product, ProductInsert, ProductUpdate } from '@/types/product';
 
 export const productService = {
@@ -20,7 +21,7 @@ export const productService = {
     const { data, error } = await supabase
       .from('products')
       .select('*')
-      .eq('category_id', categoryId);
+      .eq('category', categoryId);
     
     if (error) {
       console.error('Error fetching products by category:', error);

@@ -1,5 +1,5 @@
 
-// Type for database entity
+// Type for category entity
 export interface Category {
   id: string;
   name: string;
@@ -18,7 +18,7 @@ export type CategoryInsert = {
   slug: string;
 };
 
-// Type for RPC function responses - needed to properly type Supabase RPC calls
+// Type for Supabase responses
 export type PostgrestResponse<T> = {
   data: T | null;
   error: any;

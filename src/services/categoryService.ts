@@ -1,13 +1,16 @@
 
 import { supabase, toast } from './base';
-import type { Category, CategoryInsert, CategoryUpdate, PostgrestResponse } from '@/types/category';
+import type { Category, CategoryInsert, CategoryUpdate } from '@/types/category';
 
+// Since the categories table doesn't exist in the database schema, 
+// we'll use a custom implementation that stores categories in products
 export const categoryService = {
   async getAll(): Promise<Category[]> {
-    // Using RPC for categories
+    // Get unique categories from products table
     const { data, error } = await supabase
-      .from('categories')
-      .select('*') as PostgrestResponse<Category[]>;
+      .from('products')
+      .select('category')
+      .is('category', 'not.null');
     
     if (error) {
       console.error('Error fetching categories:', error);
@@ -15,19 +18,28 @@ export const categoryService = {
       return [];
     }
     
-    if (!data) {
+    if (!data || data.length === 0) {
       return [];
     }
     
-    return Array.isArray(data) ? data : [data];
+    // Create category objects from product categories
+    const uniqueCategories = [...new Set(data.map(item => item.category))];
+    
+    return uniqueCategories.map(categoryName => ({
+      id: categoryName,
+      name: categoryName,
+      slug: categoryName.toLowerCase().replace(/\s+/g, '-'),
+      created_at: new Date().toISOString()
+    }));
   },
   
   async getById(id: string): Promise<Category | null> {
-    // Using RPC for getting a single category
+    // Get products with matching category
     const { data, error } = await supabase
-      .from('categories')
-      .select('*')
-      .eq('id', id) as PostgrestResponse<Category[]>;
+      .from('products')
+      .select('category')
+      .eq('category', id)
+      .limit(1);
     
     if (error) {
       console.error(`Error fetching category with id ${id}:`, error);
@@ -35,25 +47,31 @@ export const categoryService = {
       return null;
     }
     
-    if (!data) {
+    if (!data || data.length === 0) {
       return null;
     }
     
-    // Handle possible array or single object response
-    if (Array.isArray(data)) {
-      return data.length > 0 ? data[0] : null;
-    }
-    
-    return data as Category;
+    // Return category object
+    return {
+      id: id,
+      name: data[0].category,
+      slug: data[0].category.toLowerCase().replace(/\s+/g, '-'),
+      created_at: new Date().toISOString()
+    };
   },
   
   async create(category: CategoryInsert): Promise<Category | null> {
-    // Using direct table insertion instead of RPC
-    const { data, error } = await supabase
-      .from('categories')
-      .insert(category)
-      .select()
-      .single() as PostgrestResponse<Category>;
+    // Since we don't have a categories table, we'll create a dummy product 
+    // with this category to ensure it exists
+    const { error } = await supabase
+      .from('products')
+      .insert({
+        name: `Category ${category.name}`,
+        description: `Products in ${category.name} category`,
+        price: 0,
+        category: category.name,
+        images: []
+      });
     
     if (error) {
       console.error('Error creating category:', error);
@@ -61,28 +79,22 @@ export const categoryService = {
       return null;
     }
     
-    if (!data) {
-      return null;
-    }
-    
     toast.success('Category created successfully');
     
-    // Handle possible array or single object response
-    if (Array.isArray(data)) {
-      return data.length > 0 ? data[0] : null;
-    }
-    
-    return data;
+    return {
+      id: category.name,
+      name: category.name,
+      slug: category.slug,
+      created_at: new Date().toISOString()
+    };
   },
   
   async update(id: string, category: CategoryUpdate): Promise<Category | null> {
-    // Using direct table update instead of RPC
-    const { data, error } = await supabase
-      .from('categories')
-      .update(category)
-      .eq('id', id)
-      .select()
-      .single() as PostgrestResponse<Category>;
+    // Update all products with the old category to use the new category name
+    const { error } = await supabase
+      .from('products')
+      .update({ category: category.name })
+      .eq('category', id);
     
     if (error) {
       console.error(`Error updating category with id ${id}:`, error);
@@ -90,26 +102,22 @@ export const categoryService = {
       return null;
     }
     
-    if (!data) {
-      return null;
-    }
-    
     toast.success('Category updated successfully');
     
-    // Handle possible array or single object response
-    if (Array.isArray(data)) {
-      return data.length > 0 ? data[0] : null;
-    }
-    
-    return data;
+    return {
+      id: category.name || id,
+      name: category.name || id,
+      slug: category.slug || id.toLowerCase().replace(/\s+/g, '-'),
+      created_at: new Date().toISOString()
+    };
   },
   
   async delete(id: string): Promise<boolean> {
-    // Using direct table deletion instead of RPC
+    // Remove category from all products with this category
     const { error } = await supabase
-      .from('categories')
-      .delete()
-      .eq('id', id);
+      .from('products')
+      .update({ category: null })
+      .eq('category', id);
     
     if (error) {
       console.error(`Error deleting category with id ${id}:`, error);
