@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 import type { Product, ProductInsert, ProductUpdate } from '@/types/product';
 import type { Category, CategoryInsert, CategoryUpdate } from '@/types/category';
@@ -135,7 +136,12 @@ export const categoryService = {
       return null;
     }
     
-    return Array.isArray(data) ? (data[0] as Category) : (data as Category);
+    // Handle possible array or single object response
+    if (Array.isArray(data)) {
+      return data.length > 0 ? (data[0] as Category) : null;
+    }
+    
+    return data as Category;
   },
   
   async create(category: CategoryInsert): Promise<Category | null> {
@@ -157,7 +163,13 @@ export const categoryService = {
     }
     
     toast.success('Category created successfully');
-    return Array.isArray(data) ? (data[0] as Category) : (data as Category);
+    
+    // Handle possible array or single object response
+    if (Array.isArray(data)) {
+      return data.length > 0 ? (data[0] as Category) : null;
+    }
+    
+    return data as Category;
   },
   
   async update(id: string, category: CategoryUpdate): Promise<Category | null> {
@@ -180,7 +192,13 @@ export const categoryService = {
     }
     
     toast.success('Category updated successfully');
-    return Array.isArray(data) ? (data[0] as Category) : (data as Category);
+    
+    // Handle possible array or single object response
+    if (Array.isArray(data)) {
+      return data.length > 0 ? (data[0] as Category) : null;
+    }
+    
+    return data as Category;
   },
   
   async delete(id: string): Promise<boolean> {

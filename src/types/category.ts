@@ -1,5 +1,5 @@
 
-// Define the Category types directly since they don't exist in the Supabase types
+// Define the Category type as a simple interface without Supabase references
 export interface Category {
   id: string;
   name: string;
@@ -7,6 +7,7 @@ export interface Category {
   created_at?: string;
 }
 
+// Define types for updating and inserting categories
 export type CategoryUpdate = {
   name?: string;
   slug?: string;
