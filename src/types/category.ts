@@ -17,6 +17,3 @@ export type CategoryInsert = {
   name: string;
   slug: string;
 };
-
-// Define a type for RPC function responses
-export type CategoryRpcResponse = Category | Category[] | null;
