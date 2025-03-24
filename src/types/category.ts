@@ -1,5 +1,5 @@
 
-// Define the Category type as a simple interface without Supabase references
+// Define the Category type as a simple interface
 export interface Category {
   id: string;
   name: string;
