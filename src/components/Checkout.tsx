@@ -81,9 +81,9 @@ const Checkout = () => {
         notes: formData.notes,
       };
 
-      // Prepare order items
+      // Prepare order items with correct types
       const orderItems = items.map(item => ({
-        product_id: item.id,
+        product_id: item.id.toString(), // Convert to string
         quantity: item.quantity,
         price_at_time: item.price,
       }));
@@ -221,10 +221,10 @@ const Checkout = () => {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                {cartItems.map(item => (
+                {items.map(item => (
                   <div key={item.id} className="flex justify-between">
                     <span>
-                      {item.title} x {item.quantity}
+                      {item.name} x {item.quantity}
                     </span>
                     <span className="font-medium">
                       ${(item.price * item.quantity).toFixed(2)}
@@ -235,7 +235,7 @@ const Checkout = () => {
               <div className="border-t pt-4">
                 <div className="flex justify-between font-semibold">
                   <span>Total:</span>
-                  <span>${totalAmount.toFixed(2)}</span>
+                  <span>${totalPrice.toFixed(2)}</span>
                 </div>
               </div>
             </CardContent>

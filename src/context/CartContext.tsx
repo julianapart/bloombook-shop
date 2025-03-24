@@ -1,10 +1,11 @@
+
 import { createContext, useContext, useReducer, useEffect } from 'react';
 import { toast } from 'sonner';
 import { useAuth } from './AuthContext';
 
 // Define types for cart items and context
 export interface CartItem {
-  id: number;
+  id: string; // Changed from number to string to match product_id in OrderItemInsert
   name: string;
   price: number;
   quantity: number;
@@ -19,8 +20,8 @@ interface CartState {
 
 interface CartContextType extends CartState {
   addToCart: (item: CartItem) => void;
-  removeFromCart: (id: number) => void;
-  updateQuantity: (id: number, quantity: number) => void;
+  removeFromCart: (id: string) => void; // Changed from number to string
+  updateQuantity: (id: string, quantity: number) => void; // Changed from number to string
   clearCart: () => void;
 }
 
@@ -30,8 +31,8 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 // Types for our reducer actions
 type CartAction =
   | { type: 'ADD_ITEM'; payload: CartItem }
-  | { type: 'REMOVE_ITEM'; payload: number }
-  | { type: 'UPDATE_QUANTITY'; payload: { id: number; quantity: number } }
+  | { type: 'REMOVE_ITEM'; payload: string } // Changed from number to string
+  | { type: 'UPDATE_QUANTITY'; payload: { id: string; quantity: number } } // Changed from number to string
   | { type: 'CLEAR_CART' }
   | { type: 'SET_CART'; payload: CartState };
 
@@ -183,12 +184,12 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
     toast.success(`${item.name} added to cart`);
   };
 
-  const removeFromCart = (id: number) => {
+  const removeFromCart = (id: string) => { // Changed from number to string
     dispatch({ type: 'REMOVE_ITEM', payload: id });
     toast.success('Item removed from cart');
   };
 
-  const updateQuantity = (id: number, quantity: number) => {
+  const updateQuantity = (id: string, quantity: number) => { // Changed from number to string
     dispatch({
       type: 'UPDATE_QUANTITY',
       payload: { id, quantity }

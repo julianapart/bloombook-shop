@@ -108,7 +108,7 @@ export const productService = {
 // Category services
 export const categoryService = {
   async getAll(): Promise<Category[]> {
-    // Direct SQL query for categories since it's not in the types yet
+    // Using RPC for categories since it's not in the types
     const { data, error } = await supabase
       .rpc('get_all_categories');
     
@@ -122,7 +122,7 @@ export const categoryService = {
   },
   
   async getById(id: string): Promise<Category | null> {
-    // Direct SQL query for a single category
+    // Using RPC for getting a single category
     const { data, error } = await supabase
       .rpc('get_category_by_id', { category_id: id });
     
@@ -132,11 +132,11 @@ export const categoryService = {
       return null;
     }
     
-    return data.length ? data[0] : null;
+    return data && data.length > 0 ? data[0] : null;
   },
   
   async create(category: CategoryInsert): Promise<Category | null> {
-    // Direct SQL query to create a category
+    // Using RPC to create a category
     const { data, error } = await supabase
       .rpc('create_category', { 
         category_name: category.name,
@@ -150,11 +150,11 @@ export const categoryService = {
     }
     
     toast.success('Category created successfully');
-    return data;
+    return data && data.length > 0 ? data[0] : null;
   },
   
   async update(id: string, category: CategoryUpdate): Promise<Category | null> {
-    // Direct SQL query to update a category
+    // Using RPC to update a category
     const { data, error } = await supabase
       .rpc('update_category', { 
         category_id: id,
@@ -169,12 +169,12 @@ export const categoryService = {
     }
     
     toast.success('Category updated successfully');
-    return data;
+    return data && data.length > 0 ? data[0] : null;
   },
   
   async delete(id: string): Promise<boolean> {
-    // Direct SQL query to delete a category
-    const { error } = await supabase
+    // Using RPC to delete a category
+    const { data, error } = await supabase
       .rpc('delete_category', { category_id: id });
     
     if (error) {
@@ -184,7 +184,7 @@ export const categoryService = {
     }
     
     toast.success('Category deleted successfully');
-    return true;
+    return !!data;
   }
 };
 
@@ -240,8 +240,8 @@ export const orderService = {
     // Format the items to include product details
     const formattedItems = (orderItems || []).map(item => ({
       ...item,
-      product_title: item.products?.name,
-      product_image: item.products?.images?.[0]
+      product_title: item.products?.name || '',
+      product_image: item.products?.images?.[0] || ''
     }));
     
     return {

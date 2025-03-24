@@ -134,7 +134,10 @@ const Cart = () => {
                     <span>{formatPrice(totalPrice)}</span>
                   </div>
                   
-                  <Button className="w-full bg-bloombook-600 hover:bg-bloombook-700">
+                  <Button 
+                    className="w-full bg-bloombook-600 hover:bg-bloombook-700"
+                    onClick={() => navigate('/checkout')}
+                  >
                     Proceed to Checkout
                   </Button>
                   
