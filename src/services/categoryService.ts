@@ -1,12 +1,12 @@
 
 import { supabase, toast } from './base';
-import type { Category, CategoryInsert, CategoryUpdate } from '@/types/category';
+import type { Category, CategoryInsert, CategoryUpdate, PostgrestResponse } from '@/types/category';
 
 export const categoryService = {
   async getAll(): Promise<Category[]> {
     // Using RPC for categories
     const { data, error } = await supabase
-      .rpc('get_all_categories');
+      .rpc('get_all_categories') as PostgrestResponse<Category[]>;
     
     if (error) {
       console.error('Error fetching categories:', error);
@@ -24,7 +24,7 @@ export const categoryService = {
   async getById(id: string): Promise<Category | null> {
     // Using RPC for getting a single category
     const { data, error } = await supabase
-      .rpc('get_category_by_id', { category_id: id });
+      .rpc('get_category_by_id', { category_id: id }) as PostgrestResponse<Category[]>;
     
     if (error) {
       console.error(`Error fetching category with id ${id}:`, error);
@@ -41,7 +41,7 @@ export const categoryService = {
       return data.length > 0 ? data[0] : null;
     }
     
-    return data;
+    return data as Category;
   },
   
   async create(category: CategoryInsert): Promise<Category | null> {
@@ -50,7 +50,7 @@ export const categoryService = {
       .rpc('create_category', { 
         category_name: category.name,
         category_slug: category.slug
-      });
+      }) as PostgrestResponse<Category>;
     
     if (error) {
       console.error('Error creating category:', error);
@@ -79,7 +79,7 @@ export const categoryService = {
         category_id: id,
         category_name: category.name || null,
         category_slug: category.slug || null
-      });
+      }) as PostgrestResponse<Category>;
     
     if (error) {
       console.error(`Error updating category with id ${id}:`, error);
@@ -104,7 +104,7 @@ export const categoryService = {
   async delete(id: string): Promise<boolean> {
     // Using RPC to delete a category
     const { data, error } = await supabase
-      .rpc('delete_category', { category_id: id });
+      .rpc('delete_category', { category_id: id }) as PostgrestResponse<boolean>;
     
     if (error) {
       console.error(`Error deleting category with id ${id}:`, error);
