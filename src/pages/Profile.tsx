@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
@@ -59,6 +58,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import type { Profile, ProfileUpdate } from '@/types/profile';
 
 // Form schema
 const profileSchema = z.object({
@@ -67,16 +67,8 @@ const profileSchema = z.object({
   address: z.string().optional(),
 });
 
-// Extended profile type to include address
-interface ExtendedProfile {
-  id: string;
-  full_name: string | null;
-  avatar_url: string | null;
-  phone: string | null;
-  updated_at: string | null;
-  address?: string | null;
-  role?: string;
-}
+// Update the ExtendedProfile type to use Supabase types
+type ExtendedProfile = Profile;
 
 type ProfileFormValues = z.infer<typeof profileSchema>;
 
@@ -122,66 +114,68 @@ const Profile = () => {
       
       const { data, error } = await supabase
         .from('profiles')
-        .select('*')
+        .select()
         .eq('id', user?.id)
-        .single();
+        .maybeSingle();
 
-      if (error) {
-        console.error('Error fetching profile:', error);
-        setProfileError(error.message);
-        throw error;
-      }
+    if (error) {
+      console.error('Error fetching profile:', error);
+      setProfileError(error.message);
+      throw error;
+    }
 
+    if (data) {
       console.log("Profile data retrieved:", data);
-      
-      // Cast to our extended profile type
-      setProfile(data as ExtendedProfile);
-      
-      // Set form default values
+      setProfile(data);
       form.reset({
         full_name: data.full_name || '',
         phone: data.phone || '',
-        address: (data as ExtendedProfile).address || '',
+        address: data.address || '',
       });
-    } catch (error) {
-      console.error('Error fetching profile:', error);
-      toast.error('Failed to load profile');
-    } finally {
-      setProfileLoading(false);
     }
-  };
+  } catch (error) {
+    console.error('Error fetching profile:', error);
+    toast.error('Failed to load profile');
+  } finally {
+    setProfileLoading(false);
+  }
+};
 
-  const onSubmit = async (data: ProfileFormValues) => {
-    try {
-      setIsSaving(true);
-      
-      const { error } = await supabase
-        .from('profiles')
-        .update({
-          full_name: data.full_name,
-          phone: data.phone,
-          address: data.address,
-        })
-        .eq('id', user?.id);
-      
-      if (error) throw error;
-      
-      // Update local profile state
+const onSubmit = async (data: ProfileFormValues) => {
+  if (!user) return;
+  
+  try {
+    setIsSaving(true);
+    
+    const updateData: ProfileUpdate = {
+      full_name: data.full_name,
+      phone: data.phone,
+      address: data.address,
+    };
+
+    const { error } = await supabase
+      .from('profiles')
+      .update(updateData)
+      .eq('id', user.id);
+    
+    if (error) throw error;
+    
+    // Update local profile state
+    if (profile) {
       setProfile({
-        ...profile!,
-        full_name: data.full_name,
-        phone: data.phone,
-        address: data.address,
+        ...profile,
+        ...updateData,
       });
-      
-      toast.success('Profile updated successfully');
-    } catch (error: any) {
-      console.error('Error updating profile:', error);
-      toast.error(error.error_description || error.message || 'Failed to update profile');
-    } finally {
-      setIsSaving(false);
     }
-  };
+    
+    toast.success('Profile updated successfully');
+  } catch (error: any) {
+    console.error('Error updating profile:', error);
+    toast.error(error.error_description || error.message || 'Failed to update profile');
+  } finally {
+    setIsSaving(false);
+  }
+};
 
   const promoteToAdmin = async () => {
     if (!user) return;

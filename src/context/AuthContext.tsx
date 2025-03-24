@@ -1,8 +1,10 @@
-
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import type { Database } from '@/integrations/supabase/types';
+
+type Profile = Database['public']['Tables']['profiles']['Row'];
 
 // Types
 interface AuthContextType {
@@ -14,17 +16,6 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string, name: string) => Promise<void>;
   logout: () => Promise<void>;
-}
-
-// Extended profile type to include role and address
-interface ExtendedProfile {
-  id: string;
-  full_name: string | null;
-  avatar_url: string | null;
-  phone: string | null;
-  updated_at: string | null;
-  role?: string;
-  address?: string | null;
 }
 
 // Create the context
@@ -50,25 +41,18 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         
         if (session?.user) {
           // Check if user is admin
-          try {
-            const { data, error } = await supabase
-              .from('profiles')
-              .select('*')
-              .eq('id', session.user.id)
-              .single();
+          const { data, error } = await supabase
+            .from('profiles')
+            .select()
+            .eq('id', session.user.id)
+            .maybeSingle();
               
-            if (error) {
-              console.error('Error checking admin status:', error);
-              setIsAdmin(false);
-            } else if (data) {
-              // Safely check if role property exists
-              const profile = data as ExtendedProfile;
-              setIsAdmin(profile.role === 'admin');
-              console.log("User profile loaded:", profile);
-            }
-          } catch (error) {
+          if (error) {
             console.error('Error checking admin status:', error);
             setIsAdmin(false);
+          } else if (data) {
+            setIsAdmin(data.role === 'admin');
+            console.log("User profile loaded:", data);
           }
         } else {
           setIsAdmin(false);
@@ -86,18 +70,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         // Check if user is admin
         supabase
           .from('profiles')
-          .select('*')
+          .select()
           .eq('id', session.user.id)
-          .single()
+          .maybeSingle()
           .then(({ data, error }) => {
             if (error) {
               console.error('Error checking admin status:', error);
               setIsAdmin(false);
             } else if (data) {
-              // Safely check if role property exists
-              const profile = data as ExtendedProfile;
-              setIsAdmin(profile.role === 'admin');
-              console.log("User profile loaded:", profile);
+              setIsAdmin(data.role === 'admin');
+              console.log("User profile loaded:", data);
             }
             setLoading(false);
           });

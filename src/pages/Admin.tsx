@@ -50,6 +50,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import type { Product, ProductUpdate, ProductInsert } from '@/types/product';
+import type { Profile, ProfileUpdate } from '@/types/profile';
 
 // Product type
 interface Product {
@@ -138,7 +140,7 @@ const Admin = () => {
       // Fetch products from Supabase
       const { data: productsData, error: productsError } = await supabase
         .from('products')
-        .select('*');
+        .select();
 
       if (productsError) throw productsError;
       setProducts(productsData);
@@ -146,27 +148,27 @@ const Admin = () => {
       // Fetch user profiles
       const { data: profilesData, error: profilesError } = await supabase
         .from('profiles')
-        .select('*');
+        .select();
 
       if (profilesError) throw profilesError;
 
-      // Get emails for profiles by fetching auth users
-      const usersWithRoles: ExtendedProfile[] = profilesData.map(profile => ({
+      // Get emails for profiles
+      const usersWithRoles = profilesData.map(profile => ({
         ...profile,
-        role: (profile as ExtendedProfile).role || 'user' // Default to 'user' if role is missing
+        role: profile.role || 'user' // Default to 'user' if role is missing
       }));
       
       setUsers(usersWithRoles);
 
       // Calculate categories by grouping products
       if (productsData.length > 0) {
-        const categoryMap = productsData.reduce((acc, product) => {
+        const categoryMap = productsData.reduce<Record<string, number>>((acc, product) => {
           if (!acc[product.category]) {
             acc[product.category] = 0;
           }
           acc[product.category]++;
           return acc;
-        }, {} as Record<string, number>);
+        }, {});
 
         const categoryList = Object.entries(categoryMap).map(([name, count]) => ({
           name,
@@ -238,17 +240,18 @@ const Admin = () => {
       const product = productDialog.product;
       
       if (productDialog.isNew) {
-        // Create new product
+        const newProduct: ProductInsert = {
+          name: product.name,
+          price: product.price,
+          category: product.category,
+          description: product.description,
+          images: product.images,
+          gender: product.gender
+        };
+        
         const { data, error } = await supabase
           .from('products')
-          .insert([{
-            name: product.name,
-            price: product.price,
-            category: product.category,
-            description: product.description,
-            images: product.images,
-            gender: product.gender
-          }])
+          .insert(newProduct)
           .select()
           .single();
         
@@ -257,17 +260,18 @@ const Admin = () => {
         setProducts([...products, data]);
         toast.success("Product created successfully");
       } else {
-        // Update existing product
+        const updateData: ProductUpdate = {
+          name: product.name,
+          price: product.price,
+          category: product.category,
+          description: product.description,
+          images: product.images,
+          gender: product.gender
+        };
+        
         const { data, error } = await supabase
           .from('products')
-          .update({
-            name: product.name,
-            price: product.price,
-            category: product.category,
-            description: product.description,
-            images: product.images,
-            gender: product.gender
-          })
+          .update(updateData)
           .eq('id', product.id)
           .select()
           .single();
