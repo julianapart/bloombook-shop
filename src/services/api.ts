@@ -1,7 +1,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import type { Product, ProductInsert, ProductUpdate } from '@/types/product';
-import type { Category, CategoryInsert, CategoryUpdate } from '@/types/category';
+import type { Category, CategoryInsert, CategoryUpdate, CategoryRpcResponse } from '@/types/category';
 import type { Order, OrderInsert, OrderItem, OrderItemInsert, OrderWithItems } from '@/types/order';
 import type { Profile, ProfileUpdate, ExtendedProfile } from '@/types/profile';
 import { toast } from 'sonner';

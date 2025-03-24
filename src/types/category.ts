@@ -1,5 +1,5 @@
 
-// Define the Category type as a simple interface
+// Type for database entity
 export interface Category {
   id: string;
   name: string;
@@ -7,7 +7,7 @@ export interface Category {
   created_at?: string;
 }
 
-// Define types for updating and inserting categories
+// Types for updating and inserting categories
 export type CategoryUpdate = {
   name?: string;
   slug?: string;
@@ -17,3 +17,6 @@ export type CategoryInsert = {
   name: string;
   slug: string;
 };
+
+// Define a type for RPC function responses
+export type CategoryRpcResponse = Category | Category[] | null;
