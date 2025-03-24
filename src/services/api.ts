@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import type { Product, ProductInsert, ProductUpdate } from '@/types/product';
 import type { Category, CategoryInsert, CategoryUpdate } from '@/types/category';
@@ -118,7 +117,7 @@ export const categoryService = {
       return [];
     }
     
-    return data as Category[] || [];
+    return (data as Category[]) || [];
   },
   
   async getById(id: string): Promise<Category | null> {
@@ -132,11 +131,11 @@ export const categoryService = {
       return null;
     }
     
-    if (!data || (Array.isArray(data) && data.length === 0)) {
+    if (!data) {
       return null;
     }
     
-    return Array.isArray(data) ? data[0] as Category : data as Category;
+    return Array.isArray(data) ? (data[0] as Category) : (data as Category);
   },
   
   async create(category: CategoryInsert): Promise<Category | null> {
@@ -153,12 +152,12 @@ export const categoryService = {
       return null;
     }
     
-    if (!data || (Array.isArray(data) && data.length === 0)) {
+    if (!data) {
       return null;
     }
     
     toast.success('Category created successfully');
-    return Array.isArray(data) ? data[0] as Category : data as Category;
+    return Array.isArray(data) ? (data[0] as Category) : (data as Category);
   },
   
   async update(id: string, category: CategoryUpdate): Promise<Category | null> {
@@ -176,12 +175,12 @@ export const categoryService = {
       return null;
     }
     
-    if (!data || (Array.isArray(data) && data.length === 0)) {
+    if (!data) {
       return null;
     }
     
     toast.success('Category updated successfully');
-    return Array.isArray(data) ? data[0] as Category : data as Category;
+    return Array.isArray(data) ? (data[0] as Category) : (data as Category);
   },
   
   async delete(id: string): Promise<boolean> {
