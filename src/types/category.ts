@@ -7,5 +7,12 @@ export interface Category {
   created_at?: string;
 }
 
-export type CategoryUpdate = Partial<Omit<Category, 'id' | 'created_at'>>;
-export type CategoryInsert = Omit<Category, 'id' | 'created_at'>;
+export type CategoryUpdate = {
+  name?: string;
+  slug?: string;
+};
+
+export type CategoryInsert = {
+  name: string;
+  slug: string;
+};

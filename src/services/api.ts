@@ -118,7 +118,7 @@ export const categoryService = {
       return [];
     }
     
-    return data || [];
+    return data as Category[] || [];
   },
   
   async getById(id: string): Promise<Category | null> {
@@ -132,11 +132,11 @@ export const categoryService = {
       return null;
     }
     
-    if (!data || data.length === 0) {
+    if (!data || (Array.isArray(data) && data.length === 0)) {
       return null;
     }
     
-    return data[0];
+    return Array.isArray(data) ? data[0] as Category : data as Category;
   },
   
   async create(category: CategoryInsert): Promise<Category | null> {
@@ -153,12 +153,12 @@ export const categoryService = {
       return null;
     }
     
-    if (!data || data.length === 0) {
+    if (!data || (Array.isArray(data) && data.length === 0)) {
       return null;
     }
     
     toast.success('Category created successfully');
-    return data[0];
+    return Array.isArray(data) ? data[0] as Category : data as Category;
   },
   
   async update(id: string, category: CategoryUpdate): Promise<Category | null> {
@@ -166,8 +166,8 @@ export const categoryService = {
     const { data, error } = await supabase
       .rpc('update_category', { 
         category_id: id,
-        category_name: category.name,
-        category_slug: category.slug
+        category_name: category.name || null,
+        category_slug: category.slug || null
       });
     
     if (error) {
@@ -176,12 +176,12 @@ export const categoryService = {
       return null;
     }
     
-    if (!data || data.length === 0) {
+    if (!data || (Array.isArray(data) && data.length === 0)) {
       return null;
     }
     
     toast.success('Category updated successfully');
-    return data[0];
+    return Array.isArray(data) ? data[0] as Category : data as Category;
   },
   
   async delete(id: string): Promise<boolean> {
