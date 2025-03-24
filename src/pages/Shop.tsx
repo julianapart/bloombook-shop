@@ -44,8 +44,8 @@ const Shop = () => {
     // Apply sorting
     switch (sortBy) {
       case 'newest':
-        // Assuming newer products have higher IDs
-        filteredProducts.sort((a, b) => b.id - a.id);
+        // Use string comparison instead of numeric operations for IDs
+        filteredProducts.sort((a, b) => b.id.localeCompare(a.id));
         break;
       case 'price-asc':
         filteredProducts.sort((a, b) => {

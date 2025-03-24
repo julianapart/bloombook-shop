@@ -67,7 +67,7 @@ const products: Product[] = [
     featuredOrder: 2
   },
   {
-    id: 4,
+    id: '4', // Changed from number to string
     name: 'Pink Digital Template',
     description: 'A beautifully decorated digital template for your baby girl\'s special moments and keepsakes.',
     price: 59.99,
@@ -84,7 +84,7 @@ const products: Product[] = [
     reviews: 14
   },
   {
-    id: 5,
+    id: '5', // Changed from number to string
     name: 'Neutral Digital Template',
     description: 'A gender-neutral digital template with compartments for all your baby\'s precious first items.',
     price: 54.99,
@@ -99,7 +99,7 @@ const products: Product[] = [
     reviews: 12
   },
   {
-    id: 6,
+    id: '6', // Changed from number to string
     name: 'Birthday Card Collection',
     description: 'A set of 5 handmade birthday cards with envelopes. Each card is unique and beautifully crafted.',
     price: 19.99,
@@ -116,7 +116,7 @@ const products: Product[] = [
     featuredOrder: 3
   },
   {
-    id: 7,
+    id: '7', // Changed from number to string
     name: 'Wedding Congratulations Card',
     description: 'A beautifully handcrafted wedding card with elegant calligraphy and intricate design.',
     price: 8.99,
@@ -131,7 +131,7 @@ const products: Product[] = [
     reviews: 15
   },
   {
-    id: 8,
+    id: '8', // Changed from number to string
     name: 'Baby Shower Card Set',
     description: 'A set of 3 handmade baby shower cards with envelopes, perfect for celebrating new arrivals.',
     price: 14.99,
@@ -148,7 +148,7 @@ const products: Product[] = [
     reviews: 9
   },
   {
-    id: 9,
+    id: '9', // Changed from number to string
     name: 'Vintage Style Photo Album',
     description: 'A vintage-inspired photo album with decorative elements and 40 acid-free pages.',
     price: 45.99,
@@ -163,7 +163,7 @@ const products: Product[] = [
     reviews: 11
   },
   {
-    id: 10,
+    id: '10', // Changed from number to string
     name: 'Thank You Card Set',
     description: 'A set of 10 elegant thank you cards with matching envelopes.',
     price: 24.99,
@@ -178,7 +178,7 @@ const products: Product[] = [
     reviews: 32
   },
   {
-    id: 11,
+    id: '11', // Changed from number to string
     name: 'Deluxe Baby Memory Box',
     description: 'Our most premium baby memory box with multiple compartments, a photo frame, and space for baby\'s first shoes.',
     price: 79.99,
@@ -193,7 +193,7 @@ const products: Product[] = [
     reviews: 42
   },
   {
-    id: 12,
+    id: '12', // Changed from number to string
     name: 'Anniversary Card',
     description: 'A special handcrafted card to celebrate anniversaries, with beautiful calligraphy and design.',
     price: 9.99,
