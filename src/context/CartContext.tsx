@@ -1,4 +1,3 @@
-
 import { createContext, useContext, useReducer, useEffect } from 'react';
 import { toast } from 'sonner';
 import { useAuth } from './AuthContext';
@@ -202,7 +201,9 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const value = {
-    ...state,
+    items: state.items,
+    totalItems: state.totalItems,
+    totalPrice: state.totalPrice,
     addToCart,
     removeFromCart,
     updateQuantity,

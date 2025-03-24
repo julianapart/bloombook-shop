@@ -1,6 +1,20 @@
 
-import type { Database } from '@/integrations/supabase/types';
+// Define category types directly instead of using Database types
+// since they're not properly reflected in the Supabase types
 
-export type Category = Database['public']['Tables']['categories']['Row'];
-export type CategoryInsert = Database['public']['Tables']['categories']['Insert'];
-export type CategoryUpdate = Database['public']['Tables']['categories']['Update'];
+export interface Category {
+  id: string;
+  name: string;
+  slug: string;
+  created_at?: string;
+}
+
+export interface CategoryInsert {
+  name: string;
+  slug: string;
+}
+
+export interface CategoryUpdate {
+  name?: string;
+  slug?: string;
+}

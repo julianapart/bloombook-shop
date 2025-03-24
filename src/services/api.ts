@@ -1,7 +1,7 @@
 
 import { supabase } from '@/integrations/supabase/client';
 import type { Product, ProductInsert, ProductUpdate } from '@/types/product';
-import type { Category, CategoryInsert } from '@/types/category';
+import type { Category, CategoryInsert, CategoryUpdate } from '@/types/category';
 import type { Order, OrderInsert, OrderItem, OrderItemInsert, OrderWithItems } from '@/types/order';
 import type { Profile, ProfileUpdate, ExtendedProfile } from '@/types/profile';
 import { toast } from 'sonner';
@@ -108,9 +108,9 @@ export const productService = {
 // Category services
 export const categoryService = {
   async getAll(): Promise<Category[]> {
+    // Direct SQL query for categories since it's not in the types yet
     const { data, error } = await supabase
-      .from('categories')
-      .select('*');
+      .rpc('get_all_categories');
     
     if (error) {
       console.error('Error fetching categories:', error);
@@ -122,11 +122,9 @@ export const categoryService = {
   },
   
   async getById(id: string): Promise<Category | null> {
+    // Direct SQL query for a single category
     const { data, error } = await supabase
-      .from('categories')
-      .select('*')
-      .eq('id', id)
-      .single();
+      .rpc('get_category_by_id', { category_id: id });
     
     if (error) {
       console.error(`Error fetching category with id ${id}:`, error);
@@ -134,15 +132,16 @@ export const categoryService = {
       return null;
     }
     
-    return data;
+    return data.length ? data[0] : null;
   },
   
   async create(category: CategoryInsert): Promise<Category | null> {
+    // Direct SQL query to create a category
     const { data, error } = await supabase
-      .from('categories')
-      .insert(category)
-      .select()
-      .single();
+      .rpc('create_category', { 
+        category_name: category.name,
+        category_slug: category.slug
+      });
     
     if (error) {
       console.error('Error creating category:', error);
@@ -154,13 +153,14 @@ export const categoryService = {
     return data;
   },
   
-  async update(id: string, category: Partial<Category>): Promise<Category | null> {
+  async update(id: string, category: CategoryUpdate): Promise<Category | null> {
+    // Direct SQL query to update a category
     const { data, error } = await supabase
-      .from('categories')
-      .update(category)
-      .eq('id', id)
-      .select()
-      .single();
+      .rpc('update_category', { 
+        category_id: id,
+        category_name: category.name,
+        category_slug: category.slug
+      });
     
     if (error) {
       console.error(`Error updating category with id ${id}:`, error);
@@ -173,10 +173,9 @@ export const categoryService = {
   },
   
   async delete(id: string): Promise<boolean> {
+    // Direct SQL query to delete a category
     const { error } = await supabase
-      .from('categories')
-      .delete()
-      .eq('id', id);
+      .rpc('delete_category', { category_id: id });
     
     if (error) {
       console.error(`Error deleting category with id ${id}:`, error);
@@ -226,8 +225,8 @@ export const orderService = {
       .select(`
         *,
         products (
-          title,
-          image_url
+          name,
+          images
         )
       `)
       .eq('order_id', orderId);
@@ -241,8 +240,8 @@ export const orderService = {
     // Format the items to include product details
     const formattedItems = (orderItems || []).map(item => ({
       ...item,
-      product_title: item.products?.title,
-      product_image: item.products?.image_url?.[0]
+      product_title: item.products?.name,
+      product_image: item.products?.images?.[0]
     }));
     
     return {
@@ -363,21 +362,10 @@ export const profileService = {
       return [];
     }
     
-    // Get emails for the profiles
-    const { data: authUsers } = await supabase.auth.admin.listUsers();
-    const usersMap = new Map();
-    
-    if (authUsers?.users) {
-      authUsers.users.forEach(user => {
-        usersMap.set(user.id, user.email);
-      });
-    }
-    
-    // Add emails to profiles
+    // Map profiles to extended profiles
     return (data || []).map(profile => ({
       ...profile,
       role: (profile.role as 'admin' | 'user') || 'user',
-      email: usersMap.get(profile.id) || undefined
     }));
   },
   

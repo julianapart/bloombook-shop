@@ -23,7 +23,7 @@ interface CheckoutFormData {
 }
 
 const Checkout = () => {
-  const { cartItems, totalAmount, clearCart } = useCart();
+  const { items, totalPrice, clearCart } = useCart();
   const { user, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
@@ -39,7 +39,7 @@ const Checkout = () => {
   });
 
   // Check if cart is empty or user is not authenticated
-  if (cartItems.length === 0) {
+  if (items.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-12">
         <h2 className="text-2xl font-semibold mb-4">Your cart is empty</h2>
@@ -82,7 +82,7 @@ const Checkout = () => {
       };
 
       // Prepare order items
-      const orderItems = cartItems.map(item => ({
+      const orderItems = items.map(item => ({
         product_id: item.id,
         quantity: item.quantity,
         price_at_time: item.price,
@@ -92,7 +92,7 @@ const Checkout = () => {
       const order = await orderService.createOrder(
         {
           user_id: user!.id,
-          total_amount: totalAmount,
+          total_amount: totalPrice,
           shipping_address: shippingAddress,
         },
         orderItems
