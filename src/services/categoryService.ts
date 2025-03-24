@@ -9,8 +9,7 @@ export const categoryService = {
     // Get unique categories from products table
     const { data, error } = await supabase
       .from('products')
-      .select('category')
-      .is('category', 'not.null');
+      .select('category');
     
     if (error) {
       console.error('Error fetching categories:', error);
@@ -38,7 +37,7 @@ export const categoryService = {
     const { data, error } = await supabase
       .from('products')
       .select('category')
-      .eq('category', id)
+      .eq('category', id as any)
       .limit(1);
     
     if (error) {
@@ -94,7 +93,7 @@ export const categoryService = {
     const { error } = await supabase
       .from('products')
       .update({ category: category.name })
-      .eq('category', id);
+      .eq('category', id as any);
     
     if (error) {
       console.error(`Error updating category with id ${id}:`, error);
@@ -117,7 +116,7 @@ export const categoryService = {
     const { error } = await supabase
       .from('products')
       .update({ category: null })
-      .eq('category', id);
+      .eq('category', id as any);
     
     if (error) {
       console.error(`Error deleting category with id ${id}:`, error);

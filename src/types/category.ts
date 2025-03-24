@@ -19,7 +19,7 @@ export type CategoryInsert = {
 };
 
 // Type for Supabase responses
-export type PostgrestResponse<T> = {
+export interface PostgrestResponse<T> {
   data: T | null;
   error: any;
-};
+}

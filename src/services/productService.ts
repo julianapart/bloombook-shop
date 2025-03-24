@@ -21,7 +21,7 @@ export const productService = {
     const { data, error } = await supabase
       .from('products')
       .select('*')
-      .eq('category_id', categoryId);
+      .eq('category', categoryId);
     
     if (error) {
       console.error('Error fetching products by category:', error);
