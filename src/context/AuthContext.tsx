@@ -51,7 +51,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             console.error('Error checking admin status:', error);
             setIsAdmin(false);
           } else if (data) {
-            setIsAdmin(data.role === 'admin');
+            const profile = data as Profile;
+            setIsAdmin(profile.role === 'admin');
             console.log("User profile loaded:", data);
           }
         } else {
@@ -78,7 +79,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
               console.error('Error checking admin status:', error);
               setIsAdmin(false);
             } else if (data) {
-              setIsAdmin(data.role === 'admin');
+              const profile = data as Profile;
+              setIsAdmin(profile.role === 'admin');
               console.log("User profile loaded:", data);
             }
             setLoading(false);

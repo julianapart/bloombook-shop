@@ -51,14 +51,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import type { Product, ProductUpdate, ProductInsert } from '@/types/product';
-import type { Profile, ProfileUpdate } from '@/types/profile';
-
-// Extended profile type for admin interface
-interface ExtendedProfile extends Omit<Profile, 'role'> {
-  role: 'admin' | 'user';
-  email?: string; // Added for UI
-  address?: string | null;
-}
+import type { Profile, ProfileUpdate, ExtendedProfile } from '@/types/profile';
 
 // Category type
 interface Category {
