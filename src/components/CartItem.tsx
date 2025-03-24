@@ -4,13 +4,13 @@ import { Link } from 'react-router-dom';
 import { Trash2, Minus, Plus } from 'lucide-react';
 
 interface CartItemProps {
-  id: number;
+  id: string; // Changed from number to string
   name: string;
   price: number;
   quantity: number;
   imageSrc: string;
-  onUpdateQuantity: (id: number, quantity: number) => void;
-  onRemove: (id: number) => void;
+  onUpdateQuantity: (id: string, quantity: number) => void; // Changed from number to string
+  onRemove: (id: string) => void; // Changed from number to string
 }
 
 const CartItem = ({ 

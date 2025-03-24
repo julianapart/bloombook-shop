@@ -105,10 +105,10 @@ export const productService = {
   }
 };
 
-// Category services
+// Category services - Using RPC functions instead of direct table access
 export const categoryService = {
   async getAll(): Promise<Category[]> {
-    // Using RPC for categories since it's not in the types
+    // Using RPC for categories
     const { data, error } = await supabase
       .rpc('get_all_categories');
     
@@ -132,7 +132,11 @@ export const categoryService = {
       return null;
     }
     
-    return data && data.length > 0 ? data[0] : null;
+    if (!data || data.length === 0) {
+      return null;
+    }
+    
+    return data[0];
   },
   
   async create(category: CategoryInsert): Promise<Category | null> {
@@ -149,8 +153,12 @@ export const categoryService = {
       return null;
     }
     
+    if (!data || data.length === 0) {
+      return null;
+    }
+    
     toast.success('Category created successfully');
-    return data && data.length > 0 ? data[0] : null;
+    return data[0];
   },
   
   async update(id: string, category: CategoryUpdate): Promise<Category | null> {
@@ -168,8 +176,12 @@ export const categoryService = {
       return null;
     }
     
+    if (!data || data.length === 0) {
+      return null;
+    }
+    
     toast.success('Category updated successfully');
-    return data && data.length > 0 ? data[0] : null;
+    return data[0];
   },
   
   async delete(id: string): Promise<boolean> {
@@ -240,7 +252,7 @@ export const orderService = {
     // Format the items to include product details
     const formattedItems = (orderItems || []).map(item => ({
       ...item,
-      product_title: item.products?.name || '',
+      product_name: item.products?.name || '',
       product_image: item.products?.images?.[0] || ''
     }));
     

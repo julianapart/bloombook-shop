@@ -40,7 +40,7 @@ const ProductDetail = () => {
   
   const handleAddToCart = () => {
     addToCart({
-      id: product.id,
+      id: product.id.toString(), // Convert number to string
       name: product.name,
       price: product.isOnSale && product.salePrice ? product.salePrice : product.price,
       imageSrc: product.images[0],

@@ -7,7 +7,7 @@ import { useCart } from '@/context/CartContext';
 import { toast } from 'sonner';
 
 interface ProductCardProps {
-  id: number;
+  id: string; // Changed from number to string
   name: string;
   price: number;
   imageSrc: string;
@@ -45,7 +45,7 @@ const ProductCard = ({
     const productPrice = isOnSale && salePrice ? salePrice : price;
     
     addToCart({
-      id,
+      id, // Now this is a string
       name,
       price: productPrice,
       quantity: 1,

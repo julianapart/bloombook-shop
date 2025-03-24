@@ -1,6 +1,6 @@
 
 export interface Product {
-  id: number;
+  id: string; // Changed from number to string
   name: string;
   description: string;
   price: number;
@@ -18,7 +18,7 @@ export interface Product {
 
 const products: Product[] = [
   {
-    id: 1,
+    id: '1', // Changed from number to string
     name: 'Linen Photo Album',
     description: 'A beautiful handcrafted photo album with linen cover and acid-free pages. Perfect for preserving your precious memories.',
     price: 49.99,
@@ -36,7 +36,7 @@ const products: Product[] = [
     featuredOrder: 1
   },
   {
-    id: 2,
+    id: '2', // Changed from number to string
     name: 'Classic Leather Photo Album',
     description: 'A timeless leather-bound photo album with elegant stitching and 50 acid-free pages.',
     price: 69.99,
@@ -51,7 +51,7 @@ const products: Product[] = [
     reviews: 36
   },
   {
-    id: 3,
+    id: '3', // Changed from number to string
     name: 'Blue Digital Template',
     description: 'A professionally designed digital template for your baby boy\'s treasured keepsakes, including first tooth, lock of hair, and more.',
     price: 59.99,
@@ -224,16 +224,19 @@ export const getProductsByCategory = (category: string) => {
   );
 };
 
-export const getProductById = (id: number) => {
-  return products.find(product => product.id === id);
+export const getProductById = (id: number | string) => {
+  // Allow lookup by either number or string id
+  const stringId = id.toString();
+  return products.find(product => product.id === stringId);
 };
 
-export const getRelatedProducts = (id: number, limit = 4) => {
-  const product = getProductById(id);
+export const getRelatedProducts = (id: number | string, limit = 4) => {
+  const stringId = id.toString();
+  const product = getProductById(stringId);
   if (!product) return [];
   
   return products
-    .filter(p => p.category === product.category && p.id !== id)
+    .filter(p => p.category === product.category && p.id !== stringId)
     .slice(0, limit);
 };
 

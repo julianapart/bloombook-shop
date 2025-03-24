@@ -83,7 +83,7 @@ const Checkout = () => {
 
       // Prepare order items with correct types
       const orderItems = items.map(item => ({
-        product_id: item.id.toString(), // Convert to string
+        product_id: item.id, // Already a string
         quantity: item.quantity,
         price_at_time: item.price,
       }));
