@@ -53,24 +53,9 @@ import {
 import type { Product, ProductUpdate, ProductInsert } from '@/types/product';
 import type { Profile, ProfileUpdate } from '@/types/profile';
 
-// Product type
-interface Product {
-  id: string;
-  name: string;
-  price: number;
-  category: string;
-  description: string;
-  images: string[];
-  gender?: string | null;
-}
-
 // Extended profile type for admin interface
-interface ExtendedProfile {
-  id: string;
-  full_name: string | null;
-  avatar_url: string | null;
-  phone: string | null;
-  role?: 'admin' | 'user';
+interface ExtendedProfile extends Omit<Profile, 'role'> {
+  role: 'admin' | 'user';
   email?: string; // Added for UI
   address?: string | null;
 }
@@ -143,7 +128,7 @@ const Admin = () => {
         .select();
 
       if (productsError) throw productsError;
-      setProducts(productsData);
+      setProducts(productsData as Product[]);
 
       // Fetch user profiles
       const { data: profilesData, error: profilesError } = await supabase
@@ -155,10 +140,10 @@ const Admin = () => {
       // Get emails for profiles
       const usersWithRoles = profilesData.map(profile => ({
         ...profile,
-        role: profile.role || 'user' // Default to 'user' if role is missing
+        role: (profile.role as 'admin' | 'user') || 'user' // Default to 'user' if role is missing
       }));
       
-      setUsers(usersWithRoles);
+      setUsers(usersWithRoles as ExtendedProfile[]);
 
       // Calculate categories by grouping products
       if (productsData.length > 0) {
@@ -202,7 +187,9 @@ const Admin = () => {
         category: '',
         description: '',
         images: [],
-        gender: 'Unisex'
+        gender: 'Unisex',
+        created_at: null,
+        updated_at: null
       },
       isNew: true
     });
@@ -257,7 +244,7 @@ const Admin = () => {
         
         if (error) throw error;
         
-        setProducts([...products, data]);
+        setProducts([...products, data as Product]);
         toast.success("Product created successfully");
       } else {
         const updateData: ProductUpdate = {
@@ -278,7 +265,7 @@ const Admin = () => {
         
         if (error) throw error;
         
-        setProducts(products.map(p => p.id === product.id ? data : p));
+        setProducts(products.map(p => p.id === product.id ? (data as Product) : p));
         toast.success("Product updated successfully");
       }
       
@@ -318,7 +305,7 @@ const Admin = () => {
         // Update category for all products with this category
         const { error } = await supabase
           .from('products')
-          .update({ category: newCategory })
+          .update({ category: newCategory } as ProductUpdate)
           .eq('category', oldCategory);
         
         if (error) throw error;
@@ -387,7 +374,7 @@ const Admin = () => {
           role: userDialog.user.role,
           phone: userDialog.user.phone,
           address: userDialog.user.address
-        })
+        } as ProfileUpdate)
         .eq('id', userDialog.user.id);
       
       if (error) throw error;
