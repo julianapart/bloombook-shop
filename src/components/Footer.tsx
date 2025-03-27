@@ -15,8 +15,7 @@ const Footer = () => {
               BloomBook
             </Link>
             <p className="mt-4 text-bloombook-600 text-sm leading-relaxed">
-              Handcrafted with love, our products celebrate life's precious moments through 
-              thoughtfully designed photo albums, digital products, and cards.
+              Handcrafted with love, our products celebrate life's precious moments.
             </p>
             <div className="flex mt-6 space-x-4">
               <a href="#" className="text-bloombook-600 hover:text-bloombook-800 transition-colors">
