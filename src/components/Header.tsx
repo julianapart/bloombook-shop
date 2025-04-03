@@ -51,9 +51,14 @@ const Header = () => {
   };
 
   // Handle logout
-  const handleLogout = async () => {
-    await logout();
-    setIsProfileMenuOpen(false);
+  const handleLogout = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    try {
+      await logout();
+      setIsProfileMenuOpen(false);
+    } catch (error) {
+      console.error("Error in handleLogout:", error);
+    }
   };
 
   // Navigation links

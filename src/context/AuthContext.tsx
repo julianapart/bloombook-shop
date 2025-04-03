@@ -148,11 +148,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   // Logout function
   const logout = async () => {
     try {
+      console.log("Attempting to log out");
       const { error } = await supabase.auth.signOut();
-      if (error) throw error;
       
+      if (error) {
+        console.error("Logout error:", error.message);
+        throw error;
+      }
+      
+      console.log("Logout successful");
+      // Force reload to clear any state
       window.location.href = '/';
     } catch (error: any) {
+      console.error("Error during logout:", error);
       toast.error(error.message || 'Failed to log out');
     }
   };
