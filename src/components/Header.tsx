@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { toast } from 'react-toastify';
+import { toast } from 'sonner';
 
 const Header = () => {
   const { pathname } = useLocation();
