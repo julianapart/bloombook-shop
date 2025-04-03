@@ -1,3 +1,4 @@
+
 // Import the necessary modules and components
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
@@ -52,7 +53,7 @@ const Header = () => {
   };
 
   // Simplified logout handler
-  const handleLogout = (e: React.MouseEvent) => {
+  const handleLogout = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     
@@ -61,7 +62,7 @@ const Header = () => {
       toast.info("Signing out...");
       
       // Call the logout function without any additional logic
-      logout();
+      await logout();
     } catch (error) {
       console.error("Error during logout:", error);
     }

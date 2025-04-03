@@ -58,6 +58,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { profileService } from '@/services/profileService';
 import type { Profile, ProfileUpdate } from '@/types/profile';
 
 // Form schema
@@ -73,8 +74,9 @@ type ExtendedProfile = Profile;
 type ProfileFormValues = z.infer<typeof profileSchema>;
 
 const Profile = () => {
+  console.log("Profile page rendering");
   const navigate = useNavigate();
-  const { user, isAuthenticated, loading, isAdmin } = useAuth();
+  const { user, isAuthenticated, loading: authLoading } = useAuth();
   const [profileLoading, setProfileLoading] = useState(true);
   const [profileError, setProfileError] = useState<string | null>(null);
   const [profile, setProfile] = useState<ExtendedProfile | null>(null);
@@ -91,91 +93,86 @@ const Profile = () => {
     },
   });
 
-  // Redirect if not authenticated
+  // Redirect if not authenticated after auth is done loading
   useEffect(() => {
-    if (!loading && !isAuthenticated) {
+    console.log("Auth state in profile:", { isAuthenticated, authLoading });
+    if (!authLoading && !isAuthenticated) {
+      console.log("Not authenticated, redirecting to login");
       navigate('/login', { state: { from: { pathname: '/profile' } } });
     }
-  }, [isAuthenticated, loading, navigate]);
+  }, [isAuthenticated, authLoading, navigate]);
 
-  // Fetch user profile
+  // Fetch user profile when authenticated
   useEffect(() => {
-    if (isAuthenticated && user) {
+    if (isAuthenticated && user && !authLoading) {
+      console.log("User authenticated, fetching profile");
       fetchProfile();
     }
-  }, [isAuthenticated, user]);
+  }, [isAuthenticated, user, authLoading]);
 
   const fetchProfile = async () => {
     try {
+      console.log("Starting profile fetch");
       setProfileLoading(true);
       setProfileError(null);
       
-      console.log("Fetching profile for user ID:", user?.id);
+      // Get profile from service
+      const profileData = await profileService.getCurrentProfile();
       
-      const { data, error } = await supabase
-        .from('profiles')
-        .select()
-        .eq('id', user?.id)
-        .maybeSingle();
-
-    if (error) {
+      if (profileData) {
+        console.log("Profile data retrieved:", profileData);
+        setProfile(profileData);
+        form.reset({
+          full_name: profileData.full_name || '',
+          phone: profileData.phone || '',
+          address: profileData.address || '',
+        });
+      } else {
+        console.error("Failed to fetch profile data");
+        setProfileError("We couldn't load your profile. Please try again.");
+      }
+    } catch (error) {
       console.error('Error fetching profile:', error);
-      setProfileError(error.message);
-      throw error;
+      setProfileError("An unexpected error occurred. Please try again.");
+      toast.error('Failed to load profile');
+    } finally {
+      setProfileLoading(false);
     }
+  };
 
-    if (data) {
-      console.log("Profile data retrieved:", data);
-      setProfile(data);
-      form.reset({
-        full_name: data.full_name || '',
-        phone: data.phone || '',
-        address: data.address || '',
+  const onSubmit = async (data: ProfileFormValues) => {
+    if (!user) return;
+    
+    try {
+      setIsSaving(true);
+      
+      const updateData: ProfileUpdate = {
+        full_name: data.full_name,
+        phone: data.phone,
+        address: data.address,
+      };
+
+      const updatedProfile = await profileService.updateProfile({
+        id: user.id,
+        ...updateData
       });
+      
+      if (updatedProfile) {
+        // Update local profile state
+        setProfile({
+          ...profile!,
+          ...updateData,
+        });
+        
+        toast.success('Profile updated successfully');
+      }
+    } catch (error: any) {
+      console.error('Error updating profile:', error);
+      toast.error(error.message || 'Failed to update profile');
+    } finally {
+      setIsSaving(false);
     }
-  } catch (error) {
-    console.error('Error fetching profile:', error);
-    toast.error('Failed to load profile');
-  } finally {
-    setProfileLoading(false);
-  }
-};
-
-const onSubmit = async (data: ProfileFormValues) => {
-  if (!user) return;
-  
-  try {
-    setIsSaving(true);
-    
-    const updateData: ProfileUpdate = {
-      full_name: data.full_name,
-      phone: data.phone,
-      address: data.address,
-    };
-
-    const { error } = await supabase
-      .from('profiles')
-      .update(updateData)
-      .eq('id', user.id);
-    
-    if (error) throw error;
-    
-    // Update local profile state
-    if (profile) {
-      setProfile({
-        ...profile,
-        ...updateData,
-      });
-    }
-    
-    toast.success('Profile updated successfully');
-  } catch (error: any) {
-    console.error('Error updating profile:', error);
-    toast.error(error.error_description || error.message || 'Failed to update profile');
-  } finally {
-    setIsSaving(false);
-  }
-};
+  };
 
   const promoteToAdmin = async () => {
     if (!user) return;
@@ -183,23 +180,20 @@ const onSubmit = async (data: ProfileFormValues) => {
     try {
       setIsPromotingToAdmin(true);
       
-      const { error } = await supabase
-        .from('profiles')
-        .update({ role: 'admin' })
-        .eq('id', user.id);
+      const success = await profileService.setAdminRole(user.id, true);
       
-      if (error) throw error;
-      
-      // Update local profile state
-      setProfile({
-        ...profile!,
-        role: 'admin',
-      });
-      
-      toast.success('You are now an admin! Please refresh the page or log out and log back in to see admin features.');
+      if (success) {
+        // Update local profile state
+        setProfile({
+          ...profile!,
+          role: 'admin',
+        });
+        
+        toast.success('You are now an admin! Please refresh the page or log out and log back in to see admin features.');
+      }
     } catch (error: any) {
       console.error('Error promoting to admin:', error);
-      toast.error(error.error_description || error.message || 'Failed to promote to admin');
+      toast.error(error.message || 'Failed to promote to admin');
     } finally {
       setIsPromotingToAdmin(false);
     }
@@ -213,7 +207,10 @@ const onSubmit = async (data: ProfileFormValues) => {
       .toUpperCase() || 'U';
   };
 
-  if (loading) {
+  console.log("Auth loading:", authLoading, "Profile loading:", profileLoading);
+
+  // Show loading state
+  if (authLoading) {
     return (
       <div className="min-h-screen flex flex-col">
         <Header />
@@ -243,6 +240,7 @@ const onSubmit = async (data: ProfileFormValues) => {
     );
   }
 
+  // Show profile error state
   if (profileError) {
     return (
       <div className="min-h-screen flex flex-col">
@@ -252,14 +250,14 @@ const onSubmit = async (data: ProfileFormValues) => {
           <h2 className="text-2xl font-medium mb-2">Error Loading Profile</h2>
           <p className="text-gray-600 mb-6 text-center">{profileError}</p>
           <p className="text-gray-600 mb-6 text-center">
-            You might need to sign up for an account first or check if you're already registered.
+            Try refreshing the page or signing out and back in.
           </p>
           <div className="flex space-x-4">
-            <Button onClick={() => navigate('/login')} variant="outline">
-              Sign In
+            <Button onClick={() => window.location.reload()} variant="outline">
+              Refresh Page
             </Button>
-            <Button onClick={() => navigate('/login', { state: { register: true } })} className="bg-bloombook-600 hover:bg-bloombook-700">
-              Sign Up
+            <Button onClick={() => fetchProfile()} className="bg-bloombook-600 hover:bg-bloombook-700">
+              Try Again
             </Button>
           </div>
         </div>
@@ -268,6 +266,7 @@ const onSubmit = async (data: ProfileFormValues) => {
     );
   }
 
+  // Show profile loading state
   if (profileLoading) {
     return (
       <div className="min-h-screen flex flex-col">

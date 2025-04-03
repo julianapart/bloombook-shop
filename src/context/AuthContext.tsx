@@ -1,3 +1,4 @@
+
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -33,47 +34,56 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     
     // Set up auth state change listener first
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        console.log("Auth state changed:", event, session?.user?.email);
-        setSession(session);
-        setUser(session?.user ?? null);
+      async (event, newSession) => {
+        console.log("Auth state changed:", event, newSession?.user?.email);
         
-        if (session?.user) {
-          // Check if user is admin
-          const { data, error } = await supabase
-            .from('profiles')
-            .select()
-            .eq('id', session.user.id)
-            .maybeSingle();
+        // Update state based on session
+        setSession(newSession);
+        setUser(newSession?.user ?? null);
+        
+        // Don't check profile inside the listener to avoid potential deadlock
+        // Instead, we'll use a setTimeout to defer this operation
+        if (newSession?.user) {
+          setTimeout(async () => {
+            try {
+              const { data, error } = await supabase
+                .from('profiles')
+                .select()
+                .eq('id', newSession.user.id)
+                .maybeSingle();
+                
+              if (!error && data) {
+                const profile = data as Profile;
+                setIsAdmin(profile.role === 'admin');
+                console.log("User profile loaded:", data);
+              }
               
-          if (error) {
-            console.error('Error checking admin status:', error);
-            setIsAdmin(false);
-          } else if (data) {
-            const profile = data as Profile;
-            setIsAdmin(profile.role === 'admin');
-            console.log("User profile loaded:", data);
-          }
+              setLoading(false);
+            } catch (err) {
+              console.error('Error checking admin status:', err);
+              setLoading(false);
+            }
+          }, 0);
         } else {
           setIsAdmin(false);
+          setLoading(false);
         }
-        
-        setLoading(false);
       }
     );
 
-    // Then check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      console.log("Existing session check:", session?.user?.email);
-      setSession(session);
-      setUser(session?.user ?? null);
+    // Check for existing session
+    supabase.auth.getSession().then(({ data: { session: existingSession } }) => {
+      console.log("Existing session check:", existingSession?.user?.email);
       
-      if (session?.user) {
+      setSession(existingSession);
+      setUser(existingSession?.user ?? null);
+      
+      if (existingSession?.user) {
         // Check if user is admin
         supabase
           .from('profiles')
           .select()
-          .eq('id', session.user.id)
+          .eq('id', existingSession.user.id)
           .maybeSingle()
           .then(({ data, error }) => {
             if (error) {
@@ -100,6 +110,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const login = async (email: string, password: string) => {
     try {
       console.log("Attempting login for:", email);
+      setLoading(true);
+      
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -107,12 +119,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       if (error) {
         console.error("Login error:", error.message);
+        setLoading(false);
         throw error;
       }
       
       console.log("Login successful for:", data.user?.email);
     } catch (error: any) {
       toast.error(error.message || 'Failed to log in');
+      setLoading(false);
       throw error;
     }
   };
@@ -121,6 +135,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const signUp = async (email: string, password: string, name: string) => {
     try {
       console.log("Attempting signup for:", email);
+      setLoading(true);
+      
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -133,45 +149,44 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
       if (error) {
         console.error("Signup error:", error.message);
+        setLoading(false);
         throw error;
       }
       
       console.log("Signup response:", data);
       toast.success('Signup successful! Please check your email to confirm your account.');
+      setLoading(false);
     } catch (error: any) {
       toast.error(error.message || 'Failed to sign up');
+      setLoading(false);
       throw error;
     }
   };
 
-  // Completely revised logout function
+  // Logout function
   const logout = async () => {
     try {
       console.log("Attempting to log out");
+      setLoading(true);
       
-      // Clear state first
+      // Clear the auth state first
       setUser(null);
       setSession(null);
       setIsAdmin(false);
       
-      // Simple approach - just sign out
+      // Sign out from Supabase
       await supabase.auth.signOut();
       
-      console.log("Logout successful, redirecting to home page");
+      console.log("Logout successful");
+      toast.success('Signed out successfully');
       
-      // Use direct window location change instead of navigate
+      // Redirect to home page
       window.location.href = '/';
     } catch (error: any) {
       console.error("Error during logout:", error);
       toast.error('Failed to log out. Please try again.');
-      
-      // If there's an error, still try to force clear the session
-      try {
-        localStorage.removeItem('sb-xqqizxdgulmuhzdqwmyn-auth-token');
-        window.location.href = '/';
-      } catch (e) {
-        console.error("Failed to manually clear session:", e);
-      }
+    } finally {
+      setLoading(false);
     }
   };
 
