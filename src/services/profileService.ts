@@ -14,7 +14,7 @@ export const profileService = {
       .from('profiles')
       .select('*')
       .eq('id', user.id)
-      .single();
+      .maybeSingle();
     
     if (error) {
       console.error('Error fetching current profile:', error);
