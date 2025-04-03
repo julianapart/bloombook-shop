@@ -6,32 +6,52 @@ import type { Profile, ProfileUpdate, ExtendedProfile } from '@/types/profile';
 export const profileService = {
   async getCurrentProfile(): Promise<Profile | null> {
     try {
-      // Get the current session directly
-      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+      // Get the current user directly from auth
+      const { data: { user } } = await supabase.auth.getUser();
       
-      if (sessionError) {
-        console.error('Error getting session:', sessionError);
-        return null;
-      }
-      
-      const session = sessionData.session;
-      
-      if (!session || !session.user) {
+      if (!user) {
         console.log('No authenticated user found');
         return null;
       }
       
-      const userId = session.user.id;
+      const userId = user.id;
       console.log('Fetching profile for user ID:', userId);
       
-      // Use maybeSingle to avoid errors when no profile is found
+      // Use single to get a single profile record
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
         .eq('id', userId)
-        .maybeSingle();
+        .single();
       
       if (error) {
+        // If the error is "No rows found", it means the profile doesn't exist yet
+        if (error.code === 'PGRST116') {
+          console.log('Profile not found, creating new profile');
+          
+          // Create a basic profile for the user
+          const newProfile: ProfileUpdate = {
+            id: userId,
+            full_name: user.user_metadata?.full_name || '',
+            avatar_url: user.user_metadata?.avatar_url || null,
+            role: 'user'
+          };
+          
+          const { data: createdProfile, error: createError } = await supabase
+            .from('profiles')
+            .insert(newProfile)
+            .select()
+            .single();
+          
+          if (createError) {
+            console.error('Error creating profile:', createError);
+            toast.error('Failed to create your profile');
+            return null;
+          }
+          
+          return createdProfile;
+        }
+        
         console.error('Error fetching current profile:', error);
         toast.error('Failed to load your profile');
         return null;
