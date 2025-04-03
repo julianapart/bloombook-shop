@@ -1,4 +1,3 @@
-
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -145,23 +144,34 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  // Logout function
+  // Completely revised logout function
   const logout = async () => {
     try {
       console.log("Attempting to log out");
-      const { error } = await supabase.auth.signOut();
       
-      if (error) {
-        console.error("Logout error:", error.message);
-        throw error;
-      }
+      // Clear state first
+      setUser(null);
+      setSession(null);
+      setIsAdmin(false);
       
-      console.log("Logout successful");
-      // Force reload to clear any state
+      // Simple approach - just sign out
+      await supabase.auth.signOut();
+      
+      console.log("Logout successful, redirecting to home page");
+      
+      // Use direct window location change instead of navigate
       window.location.href = '/';
     } catch (error: any) {
       console.error("Error during logout:", error);
-      toast.error(error.message || 'Failed to log out');
+      toast.error('Failed to log out. Please try again.');
+      
+      // If there's an error, still try to force clear the session
+      try {
+        localStorage.removeItem('sb-xqqizxdgulmuhzdqwmyn-auth-token');
+        window.location.href = '/';
+      } catch (e) {
+        console.error("Failed to manually clear session:", e);
+      }
     }
   };
 

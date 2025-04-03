@@ -6,19 +6,29 @@ import type { Profile, ProfileUpdate, ExtendedProfile } from '@/types/profile';
 export const profileService = {
   async getCurrentProfile(): Promise<Profile | null> {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      // Get the current session directly
+      const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
       
-      if (!user) {
+      if (sessionError) {
+        console.error('Error getting session:', sessionError);
+        return null;
+      }
+      
+      const session = sessionData.session;
+      
+      if (!session || !session.user) {
         console.log('No authenticated user found');
         return null;
       }
       
-      console.log('Fetching profile for user ID:', user.id);
+      const userId = session.user.id;
+      console.log('Fetching profile for user ID:', userId);
       
+      // Use maybeSingle to avoid errors when no profile is found
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
-        .eq('id', user.id)
+        .eq('id', userId)
         .maybeSingle();
       
       if (error) {

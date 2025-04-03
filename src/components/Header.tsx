@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { useCart } from '@/context/CartContext';
 import { useAuth } from '@/context/AuthContext';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { toast } from 'react-toastify';
 
 const Header = () => {
   const { pathname } = useLocation();
@@ -50,14 +51,19 @@ const Header = () => {
     if (isMenuOpen) setIsMenuOpen(false);
   };
 
-  // Handle logout
-  const handleLogout = async (e: React.MouseEvent) => {
+  // Simplified logout handler
+  const handleLogout = (e: React.MouseEvent) => {
     e.preventDefault();
+    e.stopPropagation();
+    
     try {
-      await logout();
-      setIsProfileMenuOpen(false);
+      console.log("Logout button clicked");
+      toast.info("Signing out...");
+      
+      // Call the logout function without any additional logic
+      logout();
     } catch (error) {
-      console.error("Error in handleLogout:", error);
+      console.error("Error during logout:", error);
     }
   };
 
