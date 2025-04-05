@@ -25,11 +25,11 @@ export interface ShippingAddress {
   country: string;
 }
 
-export interface OrderWithItems extends Order {
+// Use Omit to exclude shipping_address from Order and then add it back with the correct type
+export interface OrderWithItems extends Omit<Order, 'shipping_address'> {
+  shipping_address: ShippingAddress;
   items: (OrderItem & {
     product_name: string;
     product_image: string;
   })[];
-  // Override the shipping_address type from Json to our structured type
-  shipping_address: ShippingAddress;
 }

@@ -1,3 +1,4 @@
+
 import { supabase, toast } from './base';
 import type { 
   Order, 
@@ -63,11 +64,11 @@ export const orderService = {
       product_image: item.products?.images?.[0] || ''
     }));
     
-    // Cast the shipping_address to our ShippingAddress type
+    // Parse the shipping_address JSON to our ShippingAddress type
     return {
       ...order,
       items: formattedItems,
-      shipping_address: order.shipping_address as unknown as ShippingAddress
+      shipping_address: order.shipping_address as ShippingAddress
     };
   },
   
