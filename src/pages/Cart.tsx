@@ -1,5 +1,5 @@
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ShoppingBag, ArrowLeft, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -8,33 +8,19 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import CartItem from '@/components/CartItem';
 import { useCart } from '@/context/CartContext';
+import { useAuth } from '@/context/AuthContext';
 
 const Cart = () => {
   const navigate = useNavigate();
   const { items, totalItems, totalPrice, removeFromCart, updateQuantity, clearCart } = useCart();
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const { isAuthenticated, loading } = useAuth();
 
   useEffect(() => {
-    // Check if user is authenticated
-    const user = localStorage.getItem('user');
-    if (user) {
-      try {
-        const userData = JSON.parse(user);
-        setIsAuthenticated(userData.isAuthenticated);
-      } catch (error) {
-        console.error('Failed to parse user data:', error);
-      }
-    }
-    setIsLoading(false);
-  }, []);
-
-  useEffect(() => {
-    // Redirect to login if not authenticated
-    if (!isLoading && !isAuthenticated) {
+    // Redirect to login if not authenticated and not loading
+    if (!loading && !isAuthenticated) {
       navigate('/login', { state: { from: { pathname: '/cart' } } });
     }
-  }, [isAuthenticated, isLoading, navigate]);
+  }, [isAuthenticated, loading, navigate]);
 
   const formatPrice = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
@@ -43,7 +29,7 @@ const Cart = () => {
     }).format(amount);
   };
 
-  if (isLoading) {
+  if (loading) {
     return (
       <div className="min-h-screen flex flex-col">
         <Header />
