@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
@@ -147,16 +146,15 @@ const Profile = () => {
     try {
       setIsSaving(true);
       
+      // Make sure to include the user id in the update data
       const updateData: ProfileUpdate = {
+        id: user.id,
         full_name: data.full_name,
         phone: data.phone,
         address: data.address,
       };
 
-      const updatedProfile = await profileService.updateProfile({
-        id: user.id,
-        ...updateData
-      });
+      const updatedProfile = await profileService.updateProfile(updateData);
       
       if (updatedProfile) {
         // Update local profile state
