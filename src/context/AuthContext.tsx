@@ -5,6 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import type { Database } from '@/integrations/supabase/types';
 import type { Profile, ExtendedProfile } from '@/types/profile';
+import { useCart } from './CartContext'; // Import useCart to access the cart clearing functionality
 
 // Types
 interface AuthContextType {
@@ -27,7 +28,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
-
+  
   // Check auth status and set up listener on mount
   useEffect(() => {
     console.log("Setting up auth state change listener");
@@ -172,6 +173,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       // If a user is logged in, clear their cart in localStorage
       if (user?.id) {
         localStorage.removeItem(`cart_${user.id}`);
+        // Also clear guest cart to prevent showing it after logout
+        localStorage.removeItem('cart_guest');
       }
       
       // Clear the auth state first

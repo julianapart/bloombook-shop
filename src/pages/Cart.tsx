@@ -29,6 +29,7 @@ const Cart = () => {
     }).format(amount);
   };
 
+  // Show loading state while checking authentication
   if (loading) {
     return (
       <div className="min-h-screen flex flex-col">
@@ -39,6 +40,11 @@ const Cart = () => {
         <Footer />
       </div>
     );
+  }
+
+  // Don't render cart content if not authenticated
+  if (!isAuthenticated) {
+    return null; // This prevents flashing of content before redirect
   }
 
   return (

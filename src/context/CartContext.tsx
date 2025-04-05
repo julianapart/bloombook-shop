@@ -161,13 +161,14 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
         dispatch({ type: 'CLEAR_CART' });
       }
     } else {
-      // For users logging out, clear the cart in memory first
+      // For users logging out, clear the cart in memory
       dispatch({ type: 'CLEAR_CART' });
       
-      // Then check for a guest cart
+      // Then check for a guest cart only if we're not coming from a logout
+      // (which would have a non-null user but isAuthenticated false)
       const savedCart = localStorage.getItem('cart_guest');
       
-      if (savedCart) {
+      if (!user && savedCart) {
         try {
           const parsedCart = JSON.parse(savedCart);
           dispatch({ type: 'SET_CART', payload: parsedCart });
@@ -181,9 +182,14 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
 
   // Save cart to localStorage when state changes
   useEffect(() => {
-    const cartKey = isAuthenticated && user?.id ? `cart_${user.id}` : 'cart_guest';
-    localStorage.setItem(cartKey, JSON.stringify(state));
-  }, [state, isAuthenticated, user?.id]);
+    // Only save the cart if we're authenticated or truly a guest (not during logout transition)
+    if (isAuthenticated && user?.id) {
+      const cartKey = `cart_${user.id}`;
+      localStorage.setItem(cartKey, JSON.stringify(state));
+    } else if (!user) {
+      localStorage.setItem('cart_guest', JSON.stringify(state));
+    }
+  }, [state, isAuthenticated, user]);
 
   // Action functions
   const addToCart = (item: CartItem) => {
