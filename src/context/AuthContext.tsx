@@ -17,6 +17,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string, name: string) => Promise<void>;
   logout: () => Promise<void>;
+  refreshAdminStatus: () => Promise<void>;
 }
 
 // Create the context
@@ -28,6 +29,27 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
+  
+  // Function to check and update admin status
+  const refreshAdminStatus = async () => {
+    if (!user?.id) return;
+    
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select()
+        .eq('id', user.id)
+        .maybeSingle();
+        
+      if (!error && data) {
+        const profile = data as Profile;
+        setIsAdmin(profile.role === 'admin');
+        console.log("User admin status refreshed:", profile.role === 'admin');
+      }
+    } catch (err) {
+      console.error('Error refreshing admin status:', err);
+    }
+  };
   
   // Check auth status and set up listener on mount
   useEffect(() => {
@@ -206,7 +228,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     loading,
     login,
     signUp,
-    logout
+    logout,
+    refreshAdminStatus
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

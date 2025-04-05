@@ -142,5 +142,26 @@ export const profileService = {
       toast.error('An unexpected error occurred while updating user role');
       return false;
     }
+  },
+  
+  async checkIfAdminExists(): Promise<boolean> {
+    try {
+      const { data, error, count } = await supabase
+        .from('profiles')
+        .select('*', { count: 'exact' })
+        .eq('role', 'admin')
+        .limit(1);
+        
+      if (error) {
+        console.error('Error checking if admin exists:', error);
+        return false;
+      }
+      
+      // If at least one admin is found, return true
+      return (count ?? 0) > 0;
+    } catch (error) {
+      console.error('Unexpected error in checkIfAdminExists:', error);
+      return false;
+    }
   }
 };

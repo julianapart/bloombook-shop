@@ -83,6 +83,7 @@ const Profile = () => {
   const [profile, setProfile] = useState<ExtendedProfile | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [isPromotingToAdmin, setIsPromotingToAdmin] = useState(false);
+  const [adminExists, setAdminExists] = useState(true); // Default to true to hide the admin section until we confirm
 
   // Form
   const form = useForm<ProfileFormValues>({
@@ -108,8 +109,21 @@ const Profile = () => {
     if (isAuthenticated && user && !authLoading) {
       console.log("User authenticated, fetching profile");
       fetchProfile();
+      checkAdminExists();
     }
   }, [isAuthenticated, user, authLoading]);
+
+  const checkAdminExists = async () => {
+    try {
+      const exists = await profileService.checkIfAdminExists();
+      setAdminExists(exists);
+      console.log("Admin exists:", exists);
+    } catch (error) {
+      console.error("Error checking if admin exists:", error);
+      // Default to true if there's an error to hide admin promotion section
+      setAdminExists(true);
+    }
+  };
 
   const fetchProfile = async () => {
     try {
@@ -188,6 +202,9 @@ const Profile = () => {
           ...profile!,
           role: 'admin',
         });
+        
+        // Update admin exists state to hide the section from other users
+        setAdminExists(true);
         
         toast.success('You are now an admin! Please refresh the page or log out and log back in to see admin features.');
       }
@@ -361,8 +378,8 @@ const Profile = () => {
                 </CardContent>
               </Card>
               
-              {/* Admin Promotion Card */}
-              {profile?.role !== 'admin' && (
+              {/* Admin Promotion Card - Only show if no admin exists and user is not already an admin */}
+              {!adminExists && profile?.role !== 'admin' && (
                 <Card className="mt-4 border-dashed border-2 border-gray-300">
                   <CardHeader className="pb-2">
                     <CardTitle className="text-base flex items-center">
