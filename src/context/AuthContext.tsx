@@ -169,6 +169,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       console.log("Attempting to log out");
       setLoading(true);
       
+      // If a user is logged in, clear their cart in localStorage
+      if (user?.id) {
+        localStorage.removeItem(`cart_${user.id}`);
+      }
+      
       // Clear the auth state first
       setUser(null);
       setSession(null);

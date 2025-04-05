@@ -141,8 +141,9 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated, user } = useAuth();
   const [state, dispatch] = useReducer(cartReducer, initialState);
 
-  // Load cart from localStorage when user changes
+  // Track authentication status changes
   useEffect(() => {
+    // When authentication status changes, we'll handle cart data accordingly
     if (isAuthenticated && user?.id) {
       const cartKey = `cart_${user.id}`;
       const savedCart = localStorage.getItem(cartKey);
@@ -155,9 +156,15 @@ export const CartProvider = ({ children }: { children: React.ReactNode }) => {
           console.error('Failed to parse saved cart:', error);
           localStorage.removeItem(cartKey);
         }
+      } else {
+        // If no saved cart for this user, clear the cart to prevent showing guest cart
+        dispatch({ type: 'CLEAR_CART' });
       }
     } else {
-      // For non-authenticated users, use a default cart key
+      // For users logging out, clear the cart in memory first
+      dispatch({ type: 'CLEAR_CART' });
+      
+      // Then check for a guest cart
       const savedCart = localStorage.getItem('cart_guest');
       
       if (savedCart) {
