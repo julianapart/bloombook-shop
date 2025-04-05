@@ -134,6 +134,14 @@ const Header = () => {
                       Profile
                       <ChevronRight className="h-4 w-4 ml-auto" />
                     </Link>
+                    <Link
+                      to="/my-orders"
+                      className="block px-4 py-2 text-sm text-bloombook-700 hover:bg-bloombook-50 flex items-center"
+                    >
+                      <ShoppingCart className="h-4 w-4 mr-2" />
+                      My Orders
+                      <ChevronRight className="h-4 w-4 ml-auto" />
+                    </Link>
                     {isAdmin && (
                       <Link
                         to="/admin"
@@ -238,6 +246,20 @@ const Header = () => {
                       <Link to="/profile">
                         <User className="h-4 w-4 mr-2" />
                         Profile
+                      </Link>
+                    </Button>
+                    
+                    <Button asChild variant="outline" size="sm" className="w-full justify-start">
+                      <Link to="/my-orders">
+                        <ShoppingCart className="h-4 w-4 mr-2" />
+                        My Orders
+                      </Link>
+                    </Button>
+                    
+                    <Button asChild variant="outline" size="sm" className="w-full justify-start">
+                      <Link to="/account-settings">
+                        <User className="h-4 w-4 mr-2" />
+                        Account Settings
                       </Link>
                     </Button>
                     

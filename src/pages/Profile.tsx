@@ -1,5 +1,6 @@
+
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { 
   User, 
   Mail, 
@@ -330,20 +331,20 @@ const Profile = () => {
                         className="w-full justify-start"
                         asChild
                       >
-                        <span>
+                        <Link to="/my-orders">
                           <ShoppingBag className="h-4 w-4 mr-2" />
                           My Orders
-                        </span>
+                        </Link>
                       </Button>
                       <Button 
                         variant="outline" 
                         className="w-full justify-start"
                         asChild
                       >
-                        <span>
+                        <Link to="/account-settings">
                           <Settings className="h-4 w-4 mr-2" />
                           Account Settings
-                        </span>
+                        </Link>
                       </Button>
                       {isAdmin && (
                         <Button
@@ -537,9 +538,14 @@ const Profile = () => {
                         <p className="mt-2 text-sm text-bloombook-500">
                           When you place orders, they will appear here.
                         </p>
-                        <Button asChild className="mt-6 bg-bloombook-600 hover:bg-bloombook-700">
-                          <a href="/shop">Start Shopping</a>
-                        </Button>
+                        <div className="mt-6 space-x-4">
+                          <Button asChild className="bg-bloombook-600 hover:bg-bloombook-700">
+                            <Link to="/shop">Start Shopping</Link>
+                          </Button>
+                          <Button asChild variant="outline">
+                            <Link to="/my-orders">View All Orders</Link>
+                          </Button>
+                        </div>
                       </div>
                     </CardContent>
                   </Card>
