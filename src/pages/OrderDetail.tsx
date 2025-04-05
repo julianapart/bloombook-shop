@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { ShoppingBag, ArrowLeft, Package, MapPin, Clock } from 'lucide-react';
@@ -20,7 +19,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from '@/context/AuthContext';
 import { orderService } from '@/services/orderService';
-import type { OrderWithItems } from '@/types/order';
+import type { OrderWithItems, ShippingAddress } from '@/types/order';
 
 const OrderDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -169,6 +168,9 @@ const OrderDetail = () => {
     );
   }
 
+  // We now have a properly typed shipping_address
+  const shippingAddress = order.shipping_address;
+
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
@@ -266,14 +268,14 @@ const OrderDetail = () => {
                   <h3 className="text-sm font-medium text-bloombook-500 mb-1 flex items-center">
                     <MapPin className="h-4 w-4 mr-1" /> Shipping Address
                   </h3>
-                  {order.shipping_address && (
+                  {shippingAddress && (
                     <div>
-                      <p className="font-medium">{order.shipping_address.name}</p>
-                      <p>{order.shipping_address.street}</p>
+                      <p className="font-medium">{shippingAddress.name}</p>
+                      <p>{shippingAddress.street}</p>
                       <p>
-                        {order.shipping_address.city}, {order.shipping_address.state} {order.shipping_address.zip}
+                        {shippingAddress.city}, {shippingAddress.state} {shippingAddress.zip}
                       </p>
-                      <p>{order.shipping_address.country}</p>
+                      <p>{shippingAddress.country}</p>
                     </div>
                   )}
                 </div>

@@ -1,11 +1,11 @@
-
 import { supabase, toast } from './base';
 import type { 
   Order, 
   OrderInsert, 
   OrderItem, 
   OrderItemInsert, 
-  OrderWithItems 
+  OrderWithItems,
+  ShippingAddress 
 } from '@/types/order';
 
 export const orderService = {
@@ -63,9 +63,11 @@ export const orderService = {
       product_image: item.products?.images?.[0] || ''
     }));
     
+    // Cast the shipping_address to our ShippingAddress type
     return {
       ...order,
-      items: formattedItems
+      items: formattedItems,
+      shipping_address: order.shipping_address as unknown as ShippingAddress
     };
   },
   
