@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
@@ -76,7 +77,7 @@ type ProfileFormValues = z.infer<typeof profileSchema>;
 const Profile = () => {
   console.log("Profile page rendering");
   const navigate = useNavigate();
-  const { user, isAuthenticated, loading: authLoading } = useAuth();
+  const { user, isAuthenticated, loading: authLoading, isAdmin } = useAuth();
   const [profileLoading, setProfileLoading] = useState(true);
   const [profileError, setProfileError] = useState<string | null>(null);
   const [profile, setProfile] = useState<ExtendedProfile | null>(null);
