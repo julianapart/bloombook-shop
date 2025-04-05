@@ -65,10 +65,20 @@ export const orderService = {
     }));
     
     // Parse the shipping_address JSON to our ShippingAddress type
+    // First cast to unknown, then to our type, to satisfy TypeScript
+    const shippingAddress = order.shipping_address as Record<string, any>;
+    
     return {
       ...order,
       items: formattedItems,
-      shipping_address: order.shipping_address as ShippingAddress
+      shipping_address: {
+        name: shippingAddress.name || '',
+        street: shippingAddress.street || '',
+        city: shippingAddress.city || '',
+        state: shippingAddress.state || '',
+        zip: shippingAddress.zip || '',
+        country: shippingAddress.country || ''
+      }
     };
   },
   
