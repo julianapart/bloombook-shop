@@ -30,7 +30,8 @@ export const profileService = {
           console.log('Profile not found, creating new profile');
           
           // Create a basic profile for the user
-          const newProfile: ProfileUpdate = {
+          // Note: id is required and non-optional when inserting
+          const newProfile = {
             id: userId,
             full_name: user.user_metadata?.full_name || '',
             avatar_url: user.user_metadata?.avatar_url || null,
@@ -68,6 +69,13 @@ export const profileService = {
   
   async updateProfile(profile: ProfileUpdate): Promise<Profile | null> {
     try {
+      // Ensure id is provided and is not optional for the update operation
+      if (!profile.id) {
+        console.error('Profile ID is required for updating');
+        toast.error('Cannot update profile: Missing ID');
+        return null;
+      }
+
       const { data, error } = await supabase
         .from('profiles')
         .update(profile)
