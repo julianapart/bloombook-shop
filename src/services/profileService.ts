@@ -1,3 +1,4 @@
+
 import { supabase } from '../integrations/supabase/client';
 import { toast } from 'sonner';
 import type { Profile, ProfileUpdate, ExtendedProfile, StructuredAddress } from '@/types/profile';
@@ -51,7 +52,7 @@ export const profileService = {
             return null;
           }
           
-          return createdProfile;
+          return { ...createdProfile, country_code: null, email: user.email };
         }
         
         console.error('Error fetching current profile:', error);
@@ -62,7 +63,7 @@ export const profileService = {
       console.log('Profile data retrieved:', data);
       
       // Handle address field conversion if needed
-      const fetchedProfile = data;
+      const fetchedProfile = data as Profile;
       
       // Convert address string to structured format if needed
       if (fetchedProfile.address) {
@@ -70,7 +71,7 @@ export const profileService = {
           try {
             // Try to parse it as JSON if it's stored that way
             const parsedAddress = JSON.parse(fetchedProfile.address as string);
-            fetchedProfile.address = parsedAddress;
+            fetchedProfile.address = parsedAddress as unknown as any;
           } catch (e) {
             // If parsing fails, create an empty structured address
             fetchedProfile.address = {
@@ -79,12 +80,12 @@ export const profileService = {
               houseNumber: "",
               postalCode: "",
               city: ""
-            };
+            } as unknown as any;
           }
         }
       }
       
-      return fetchedProfile;
+      return { ...fetchedProfile, country_code: fetchedProfile.country_code, email: user.email };
     } catch (error) {
       console.error('Unexpected error in getCurrentProfile:', error);
       toast.error('An unexpected error occurred while loading your profile');
@@ -123,16 +124,17 @@ export const profileService = {
       }
       
       // Convert address back to structured format if it's a string
-      if (data && data.address && typeof data.address === 'string') {
+      const updatedProfile = data as Profile;
+      if (updatedProfile && updatedProfile.address && typeof updatedProfile.address === 'string') {
         try {
-          data.address = JSON.parse(data.address);
+          updatedProfile.address = JSON.parse(updatedProfile.address) as unknown as any;
         } catch (e) {
           // If parsing fails, keep as is
         }
       }
       
       toast.success('Profile updated successfully');
-      return data;
+      return { ...updatedProfile, country_code: updatedProfile.country_code };
     } catch (error) {
       console.error('Unexpected error in updateProfile:', error);
       toast.error('An unexpected error occurred while updating your profile');
@@ -178,16 +180,17 @@ export const profileService = {
           }
         }
         
+        const typedProfile = profile as Profile;
         return {
-          id: profile.id,
-          full_name: profile.full_name,
-          avatar_url: profile.avatar_url,
-          phone: profile.phone,
+          id: typedProfile.id,
+          full_name: typedProfile.full_name,
+          avatar_url: typedProfile.avatar_url,
+          phone: typedProfile.phone,
           address: structuredAddress,
-          updated_at: profile.updated_at,
-          role: (profile.role as 'admin' | 'user') || 'user',
-          country_code: profile.country_code,
-          email: profile.email
+          updated_at: typedProfile.updated_at,
+          role: (typedProfile.role as 'admin' | 'user') || 'user',
+          country_code: typedProfile.country_code,
+          email: typedProfile.email
         } as ExtendedProfile;
       });
     } catch (error) {

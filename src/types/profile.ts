@@ -1,7 +1,10 @@
 
 import type { Database } from '@/integrations/supabase/types';
 
-export type Profile = Database['public']['Tables']['profiles']['Row'];
+export type Profile = Database['public']['Tables']['profiles']['Row'] & {
+  country_code?: string | null;
+  email?: string | null;
+};
 
 // Address structure with separate fields
 export interface StructuredAddress {
@@ -42,5 +45,5 @@ export interface ExtendedProfile {
   updated_at: string | null;
   role: 'admin' | 'user';
   country_code?: string | null;
-  email?: string;
+  email?: string | null;
 }

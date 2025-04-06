@@ -52,6 +52,7 @@ import {
 } from "@/components/ui/table";
 import type { Product, ProductUpdate, ProductInsert } from '@/types/product';
 import type { Profile, ProfileUpdate, ExtendedProfile } from '@/types/profile';
+import { profileService } from '@/services/api';
 
 // Category type
 interface Category {
@@ -355,24 +356,22 @@ const Admin = () => {
         full_name: userDialog.user.full_name,
         role: userDialog.user.role,
         phone: userDialog.user.phone,
-        address: userDialog.user.address
+        address: userDialog.user.address,
+        country_code: userDialog.user.country_code
       };
       
-      const { error } = await supabase
-        .from('profiles')
-        .update(updateData)
-        .eq('id', userDialog.user.id);
+      const updatedProfile = await profileService.updateProfile(updateData);
       
-      if (error) throw error;
-      
-      // Update users in state
-      setUsers(users.map(u => 
-        u.id === userDialog.user?.id 
-          ? userDialog.user
-          : u
-      ));
-      
-      toast.success("User updated successfully");
+      if (updatedProfile) {
+        // Update users in state
+        setUsers(users.map(u => 
+          u.id === userDialog.user?.id 
+            ? { ...userDialog.user }
+            : u
+        ));
+        
+        toast.success("User updated successfully");
+      }
       setUserDialog({ isOpen: false, user: null });
     } catch (error: any) {
       console.error('Error saving user:', error);
@@ -853,11 +852,21 @@ const Admin = () => {
                 <Label htmlFor="userAddress">Address</Label>
                 <Input 
                   id="userAddress" 
-                  value={userDialog.user.address || ''} 
-                  onChange={(e) => setUserDialog({
-                    ...userDialog,
-                    user: { ...userDialog.user!, address: e.target.value }
-                  })}
+                  value={typeof userDialog.user.address === 'string' 
+                    ? userDialog.user.address 
+                    : JSON.stringify(userDialog.user.address)} 
+                  onChange={(e) => {
+                    let addressValue;
+                    try {
+                      addressValue = JSON.parse(e.target.value);
+                    } catch (err) {
+                      addressValue = e.target.value;
+                    }
+                    setUserDialog({
+                      ...userDialog,
+                      user: { ...userDialog.user!, address: addressValue }
+                    });
+                  }}
                 />
               </div>
               

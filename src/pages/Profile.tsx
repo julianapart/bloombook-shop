@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { 
@@ -80,7 +79,6 @@ import {
 import { profileService } from '@/services/profileService';
 import type { Profile, ProfileUpdate, StructuredAddress, CountryCode } from '@/types/profile';
 
-// List of countries with dialing codes
 const countryCodes: CountryCode[] = [
   { code: '+1', name: 'United States', flag: '🇺🇸' },
   { code: '+44', name: 'United Kingdom', flag: '🇬🇧' },
@@ -99,14 +97,12 @@ const countryCodes: CountryCode[] = [
   { code: '+52', name: 'Mexico', flag: '🇲🇽' },
 ];
 
-// List of countries for address
 const countries = [
   'United States', 'United Kingdom', 'France', 'Germany', 'Italy', 'Spain', 
   'Japan', 'China', 'India', 'Australia', 'Brazil', 'Russia', 'South Korea', 
   'Canada', 'Mexico'
 ];
 
-// Form schema
 const profileSchema = z.object({
   full_name: z.string().min(2, { message: 'Name must be at least 2 characters' }),
   country_code: z.string().min(1, { message: 'Country code is required' }),
@@ -132,10 +128,9 @@ const Profile = () => {
   const [profile, setProfile] = useState<any | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [isPromotingToAdmin, setIsPromotingToAdmin] = useState(false);
-  const [adminExists, setAdminExists] = useState(true); // Default to true to hide the admin section until we confirm
+  const [adminExists, setAdminExists] = useState(true);
   const [selectedCountryCode, setSelectedCountryCode] = useState<CountryCode>(countryCodes[0]);
 
-  // Form
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
@@ -153,7 +148,6 @@ const Profile = () => {
     },
   });
 
-  // Redirect if not authenticated after auth is done loading
   useEffect(() => {
     console.log("Auth state in profile:", { isAuthenticated, authLoading });
     if (!authLoading && !isAuthenticated) {
@@ -162,7 +156,6 @@ const Profile = () => {
     }
   }, [isAuthenticated, authLoading, navigate]);
 
-  // Fetch user profile when authenticated
   useEffect(() => {
     if (isAuthenticated && user && !authLoading) {
       console.log("User authenticated, fetching profile");
@@ -178,7 +171,6 @@ const Profile = () => {
       console.log("Admin exists:", exists);
     } catch (error) {
       console.error("Error checking if admin exists:", error);
-      // Default to true if there's an error to hide admin promotion section
       setAdminExists(true);
     }
   };
@@ -189,14 +181,12 @@ const Profile = () => {
       setProfileLoading(true);
       setProfileError(null);
       
-      // Get profile from service
       const profileData = await profileService.getCurrentProfile();
       
       if (profileData) {
         console.log("Profile data retrieved:", profileData);
         setProfile(profileData);
 
-        // Parse address if it exists
         let addressObj: StructuredAddress = {
           country: '',
           street: '',
@@ -206,27 +196,28 @@ const Profile = () => {
           city: '',
         };
 
-        // Try to parse existing address if it's in structured format
         if (profileData.address && typeof profileData.address === 'object') {
-          addressObj = profileData.address as StructuredAddress;
+          addressObj = profileData.address as unknown as StructuredAddress;
+        } else if (profileData.address && typeof profileData.address === 'string') {
+          try {
+            addressObj = JSON.parse(profileData.address as string);
+          } catch (e) {
+            // Keep default
+          }
         }
 
-        // Find country code or use default
         let countryCode = '+1';
         if (profileData.country_code) {
           countryCode = profileData.country_code;
         }
         
-        // Set country code in dropdown
         const foundCode = countryCodes.find(c => c.code === countryCode);
         if (foundCode) {
           setSelectedCountryCode(foundCode);
         }
 
-        // Split phone number if exists
         let phoneNumber = '';
         if (profileData.phone) {
-          // Try to remove the country code from the phone number if it exists
           const phone = profileData.phone;
           if (countryCode && phone.startsWith(countryCode)) {
             phoneNumber = phone.substring(countryCode.length).trim();
@@ -260,12 +251,10 @@ const Profile = () => {
     try {
       setIsSaving(true);
       
-      // Combine country code and phone number
       const fullPhone = data.phone_number 
         ? `${data.country_code}${data.phone_number}`
         : null;
       
-      // Make sure to include the user id in the update data
       const updateData: ProfileUpdate = {
         id: user.id,
         full_name: data.full_name,
@@ -277,7 +266,6 @@ const Profile = () => {
       const updatedProfile = await profileService.updateProfile(updateData);
       
       if (updatedProfile) {
-        // Update local profile state
         setProfile({
           ...profile!,
           ...updateData,
@@ -302,16 +290,13 @@ const Profile = () => {
       const success = await profileService.setAdminRole(user.id, true);
       
       if (success) {
-        // Update local profile state
         setProfile({
           ...profile!,
           role: 'admin',
         });
         
-        // Update admin exists state to hide the section from other users
         setAdminExists(true);
         
-        // Refresh admin status in auth context
         await refreshAdminStatus();
         
         toast.success('You are now an admin! Please refresh the page or log out and log back in to see admin features.');
@@ -332,9 +317,6 @@ const Profile = () => {
       .toUpperCase() || 'U';
   };
 
-  console.log("Auth loading:", authLoading, "Profile loading:", profileLoading);
-
-  // Show loading state
   if (authLoading) {
     return (
       <div className="min-h-screen flex flex-col">
@@ -347,7 +329,6 @@ const Profile = () => {
     );
   }
 
-  // If not authenticated, we'll redirect in the useEffect
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen flex flex-col">
@@ -365,7 +346,6 @@ const Profile = () => {
     );
   }
 
-  // Show profile error state
   if (profileError) {
     return (
       <div className="min-h-screen flex flex-col">
@@ -391,7 +371,6 @@ const Profile = () => {
     );
   }
 
-  // Show profile loading state
   if (profileLoading) {
     return (
       <div className="min-h-screen flex flex-col">
@@ -411,7 +390,6 @@ const Profile = () => {
       <main className="flex-grow">
         <div className="container mx-auto px-4 py-8 md:py-12 max-w-4xl">
           <div className="flex flex-col md:flex-row items-start gap-8">
-            {/* Sidebar */}
             <div className="w-full md:w-1/3">
               <Card>
                 <CardContent className="p-6">
@@ -440,7 +418,6 @@ const Profile = () => {
                       {user?.email}
                     </p>
                     
-                    {/* Admin status */}
                     {profile?.role === 'admin' && (
                       <div className="mt-2 flex items-center justify-center bg-green-50 text-green-700 rounded-full px-3 py-1 text-xs font-medium">
                         <Shield className="h-3 w-3 mr-1" />
@@ -486,7 +463,6 @@ const Profile = () => {
                 </CardContent>
               </Card>
               
-              {/* Admin Promotion Card - Only show if no admin exists and user is not already an admin */}
               {!adminExists && profile?.role !== 'admin' && (
                 <Card className="mt-4 border-dashed border-2 border-gray-300">
                   <CardHeader className="pb-2">
@@ -534,7 +510,6 @@ const Profile = () => {
               )}
             </div>
             
-            {/* Main content */}
             <div className="w-full md:w-2/3">
               <Tabs defaultValue="profile" className="w-full">
                 <TabsList className="grid w-full grid-cols-2 mb-8">
@@ -574,7 +549,6 @@ const Profile = () => {
                             )}
                           />
                           
-                          {/* Email field (disabled) */}
                           <div className="space-y-2">
                             <FormLabel>Email</FormLabel>
                             <div className="relative">
@@ -590,7 +564,6 @@ const Profile = () => {
                             </p>
                           </div>
                           
-                          {/* Phone Number with Country Code */}
                           <div className="space-y-2">
                             <FormLabel>Phone Number</FormLabel>
                             <div className="flex space-x-2">
@@ -654,11 +627,9 @@ const Profile = () => {
                             </div>
                           </div>
                           
-                          {/* Structured Address */}
                           <div className="space-y-4">
                             <FormLabel>Address</FormLabel>
                             
-                            {/* Country */}
                             <FormField
                               control={form.control}
                               name="address.country"
@@ -688,7 +659,6 @@ const Profile = () => {
                               )}
                             />
                             
-                            {/* Street */}
                             <FormField
                               control={form.control}
                               name="address.street"
@@ -710,7 +680,6 @@ const Profile = () => {
                               )}
                             />
                             
-                            {/* House number and Apartment in a row */}
                             <div className="flex space-x-4">
                               <FormField
                                 control={form.control}
@@ -759,7 +728,6 @@ const Profile = () => {
                               />
                             </div>
                             
-                            {/* Postal code and City in a row */}
                             <div className="flex space-x-4">
                               <FormField
                                 control={form.control}
