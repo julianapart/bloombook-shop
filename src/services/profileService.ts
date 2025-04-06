@@ -1,4 +1,3 @@
-
 import { supabase } from '../integrations/supabase/client';
 import { toast } from 'sonner';
 import type { Profile, ProfileUpdate, ExtendedProfile, StructuredAddress } from '@/types/profile';
@@ -35,7 +34,9 @@ export const profileService = {
             id: userId,
             full_name: user.user_metadata?.full_name || '',
             avatar_url: user.user_metadata?.avatar_url || null,
-            role: 'user'
+            role: 'user',
+            address: null, // Initialize with null
+            country_code: null // Add country code field
           };
           
           const { data: createdProfile, error: createError } = await supabase
@@ -64,20 +65,22 @@ export const profileService = {
       const fetchedProfile = data;
       
       // Convert address string to structured format if needed
-      if (fetchedProfile.address && typeof fetchedProfile.address === 'string') {
-        try {
-          // Try to parse it as JSON if it's stored that way
-          const parsedAddress = JSON.parse(fetchedProfile.address);
-          fetchedProfile.address = parsedAddress;
-        } catch (e) {
-          // If parsing fails, create an empty structured address
-          fetchedProfile.address = {
-            country: "",
-            street: "",
-            houseNumber: "",
-            postalCode: "",
-            city: ""
-          };
+      if (fetchedProfile.address) {
+        if (typeof fetchedProfile.address === 'string') {
+          try {
+            // Try to parse it as JSON if it's stored that way
+            const parsedAddress = JSON.parse(fetchedProfile.address as string);
+            fetchedProfile.address = parsedAddress;
+          } catch (e) {
+            // If parsing fails, create an empty structured address
+            fetchedProfile.address = {
+              country: "",
+              street: "",
+              houseNumber: "",
+              postalCode: "",
+              city: ""
+            };
+          }
         }
       }
       
@@ -99,12 +102,11 @@ export const profileService = {
       }
 
       // Create a copy of the profile object to manipulate before sending to Supabase
-      const profileToUpdate = { ...profile };
+      const profileToUpdate: any = { ...profile };
       
-      // Convert the address to JSON string if it's an object (Supabase expects a string or JSON)
+      // For Supabase, we need to convert the structured address to a string or JSON
       if (profileToUpdate.address && typeof profileToUpdate.address === 'object') {
-        // Store as JSON object directly (Supabase can handle it)
-        // No need to convert to string
+        profileToUpdate.address = JSON.stringify(profileToUpdate.address);
       }
 
       const { data, error } = await supabase
@@ -118,6 +120,15 @@ export const profileService = {
         console.error('Error updating profile:', error);
         toast.error('Failed to update your profile');
         return null;
+      }
+      
+      // Convert address back to structured format if it's a string
+      if (data && data.address && typeof data.address === 'string') {
+        try {
+          data.address = JSON.parse(data.address);
+        } catch (e) {
+          // If parsing fails, keep as is
+        }
       }
       
       toast.success('Profile updated successfully');
@@ -175,7 +186,8 @@ export const profileService = {
           address: structuredAddress,
           updated_at: profile.updated_at,
           role: (profile.role as 'admin' | 'user') || 'user',
-          country_code: profile.country_code
+          country_code: profile.country_code,
+          email: profile.email
         } as ExtendedProfile;
       });
     } catch (error) {
