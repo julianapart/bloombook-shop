@@ -1,7 +1,7 @@
 
 import { supabase } from '../integrations/supabase/client';
 import { toast } from 'sonner';
-import type { Profile, ProfileUpdate, ExtendedProfile } from '@/types/profile';
+import type { Profile, ProfileUpdate, ExtendedProfile, StructuredAddress } from '@/types/profile';
 
 export const profileService = {
   async getCurrentProfile(): Promise<Profile | null> {
@@ -59,7 +59,29 @@ export const profileService = {
       }
       
       console.log('Profile data retrieved:', data);
-      return data;
+      
+      // Handle address field conversion if needed
+      const fetchedProfile = data;
+      
+      // Convert address string to structured format if needed
+      if (fetchedProfile.address && typeof fetchedProfile.address === 'string') {
+        try {
+          // Try to parse it as JSON if it's stored that way
+          const parsedAddress = JSON.parse(fetchedProfile.address);
+          fetchedProfile.address = parsedAddress;
+        } catch (e) {
+          // If parsing fails, create an empty structured address
+          fetchedProfile.address = {
+            country: "",
+            street: "",
+            houseNumber: "",
+            postalCode: "",
+            city: ""
+          };
+        }
+      }
+      
+      return fetchedProfile;
     } catch (error) {
       console.error('Unexpected error in getCurrentProfile:', error);
       toast.error('An unexpected error occurred while loading your profile');
@@ -76,9 +98,18 @@ export const profileService = {
         return null;
       }
 
+      // Create a copy of the profile object to manipulate before sending to Supabase
+      const profileToUpdate = { ...profile };
+      
+      // Convert the address to JSON string if it's an object (Supabase expects a string or JSON)
+      if (profileToUpdate.address && typeof profileToUpdate.address === 'object') {
+        // Store as JSON object directly (Supabase can handle it)
+        // No need to convert to string
+      }
+
       const { data, error } = await supabase
         .from('profiles')
-        .update(profile)
+        .update(profileToUpdate)
         .eq('id', profile.id)
         .select()
         .single();
@@ -110,11 +141,43 @@ export const profileService = {
         return [];
       }
       
-      // Map profiles to extended profiles
-      return (data || []).map(profile => ({
-        ...profile,
-        role: (profile.role as 'admin' | 'user') || 'user',
-      }));
+      // Map profiles to extended profiles with proper typing
+      return (data || []).map(profile => {
+        // Convert address to structured format if needed
+        let structuredAddress: StructuredAddress | null = null;
+        
+        if (profile.address) {
+          if (typeof profile.address === 'string') {
+            try {
+              // Try to parse it as JSON if it's stored that way
+              structuredAddress = JSON.parse(profile.address) as StructuredAddress;
+            } catch (e) {
+              // If parsing fails, create an empty structured address
+              structuredAddress = {
+                country: "",
+                street: "",
+                houseNumber: "",
+                postalCode: "",
+                city: ""
+              };
+            }
+          } else if (typeof profile.address === 'object') {
+            // It's already an object, just cast it
+            structuredAddress = profile.address as unknown as StructuredAddress;
+          }
+        }
+        
+        return {
+          id: profile.id,
+          full_name: profile.full_name,
+          avatar_url: profile.avatar_url,
+          phone: profile.phone,
+          address: structuredAddress,
+          updated_at: profile.updated_at,
+          role: (profile.role as 'admin' | 'user') || 'user',
+          country_code: profile.country_code
+        } as ExtendedProfile;
+      });
     } catch (error) {
       console.error('Unexpected error in getAllProfiles:', error);
       toast.error('An unexpected error occurred while loading profiles');

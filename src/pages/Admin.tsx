@@ -123,20 +123,9 @@ const Admin = () => {
       if (productsError) throw productsError;
       setProducts(productsData as Product[]);
 
-      // Fetch user profiles
-      const { data: profilesData, error: profilesError } = await supabase
-        .from('profiles')
-        .select();
-
-      if (profilesError) throw profilesError;
-
-      // Get emails for profiles
-      const usersWithRoles = profilesData.map(profile => ({
-        ...profile,
-        role: (profile.role as 'admin' | 'user') || 'user' // Default to 'user' if role is missing
-      }));
-      
-      setUsers(usersWithRoles as ExtendedProfile[]);
+      // Use the profileService to get all profiles with proper typing
+      const profilesData = await profileService.getAllProfiles();
+      setUsers(profilesData);
 
       // Calculate categories by grouping products
       if (productsData.length > 0) {
@@ -360,14 +349,18 @@ const Admin = () => {
     if (!userDialog.user) return;
     
     try {
+      // Create proper ProfileUpdate object with correct typing
+      const updateData: ProfileUpdate = {
+        id: userDialog.user.id,
+        full_name: userDialog.user.full_name,
+        role: userDialog.user.role,
+        phone: userDialog.user.phone,
+        address: userDialog.user.address
+      };
+      
       const { error } = await supabase
         .from('profiles')
-        .update({
-          full_name: userDialog.user.full_name,
-          role: userDialog.user.role,
-          phone: userDialog.user.phone,
-          address: userDialog.user.address
-        } as ProfileUpdate)
+        .update(updateData)
         .eq('id', userDialog.user.id);
       
       if (error) throw error;

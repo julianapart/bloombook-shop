@@ -32,7 +32,7 @@ export interface ProfileUpdate {
   country_code?: string | null;
 }
 
-// Extended profile type with strict role typing
+// Extended profile type with strict role typing and structured address
 export interface ExtendedProfile {
   id: string;
   full_name: string | null;
