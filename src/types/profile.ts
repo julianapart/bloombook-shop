@@ -8,11 +8,11 @@ export type Profile = Database['public']['Tables']['profiles']['Row'] & {
 
 // Address structure with optional fields that match how we're using it
 export interface StructuredAddress {
-  country: string;
-  street: string;
-  houseNumber: string;
-  postalCode: string;
-  city: string;
+  country?: string;
+  street?: string;
+  houseNumber?: string;
+  postalCode?: string;
+  city?: string;
   apartmentNumber?: string; // This field is truly optional
 }
 
