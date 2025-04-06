@@ -191,16 +191,23 @@ const Profile = () => {
           country: '',
           street: '',
           houseNumber: '',
-          apartmentNumber: '',
           postalCode: '',
           city: '',
+          apartmentNumber: '',
         };
 
         if (profileData.address && typeof profileData.address === 'object') {
-          addressObj = profileData.address as unknown as StructuredAddress;
+          addressObj = {
+            ...addressObj,
+            ...(profileData.address as unknown as StructuredAddress)
+          };
         } else if (profileData.address && typeof profileData.address === 'string') {
           try {
-            addressObj = JSON.parse(profileData.address as string);
+            const parsedAddress = JSON.parse(profileData.address as string);
+            addressObj = {
+              ...addressObj,
+              ...parsedAddress
+            };
           } catch (e) {
             // Keep default
           }
