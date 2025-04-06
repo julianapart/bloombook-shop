@@ -11,7 +11,11 @@ import {
   Settings,
   Save,
   Shield,
-  AlertTriangle
+  AlertTriangle,
+  Home,
+  Building,
+  MapPinned,
+  Globe
 } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -27,6 +31,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
+  FormDescription,
 } from '@/components/ui/form';
 import {
   Card,
@@ -42,6 +47,19 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/integrations/supabase/client';
@@ -60,38 +78,78 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { profileService } from '@/services/profileService';
-import type { Profile, ProfileUpdate } from '@/types/profile';
+import type { Profile, ProfileUpdate, StructuredAddress, CountryCode } from '@/types/profile';
+
+// List of countries with dialing codes
+const countryCodes: CountryCode[] = [
+  { code: '+1', name: 'United States', flag: '🇺🇸' },
+  { code: '+44', name: 'United Kingdom', flag: '🇬🇧' },
+  { code: '+33', name: 'France', flag: '🇫🇷' },
+  { code: '+49', name: 'Germany', flag: '🇩🇪' },
+  { code: '+39', name: 'Italy', flag: '🇮🇹' },
+  { code: '+34', name: 'Spain', flag: '🇪🇸' },
+  { code: '+81', name: 'Japan', flag: '🇯🇵' },
+  { code: '+86', name: 'China', flag: '🇨🇳' },
+  { code: '+91', name: 'India', flag: '🇮🇳' },
+  { code: '+61', name: 'Australia', flag: '🇦🇺' },
+  { code: '+55', name: 'Brazil', flag: '🇧🇷' },
+  { code: '+7', name: 'Russia', flag: '🇷🇺' },
+  { code: '+82', name: 'South Korea', flag: '🇰🇷' },
+  { code: '+1', name: 'Canada', flag: '🇨🇦' },
+  { code: '+52', name: 'Mexico', flag: '🇲🇽' },
+];
+
+// List of countries for address
+const countries = [
+  'United States', 'United Kingdom', 'France', 'Germany', 'Italy', 'Spain', 
+  'Japan', 'China', 'India', 'Australia', 'Brazil', 'Russia', 'South Korea', 
+  'Canada', 'Mexico'
+];
 
 // Form schema
 const profileSchema = z.object({
   full_name: z.string().min(2, { message: 'Name must be at least 2 characters' }),
-  phone: z.string().optional(),
-  address: z.string().optional(),
+  country_code: z.string().min(1, { message: 'Country code is required' }),
+  phone_number: z.string().optional(),
+  address: z.object({
+    country: z.string().min(1, { message: 'Country is required' }),
+    street: z.string().min(1, { message: 'Street is required' }),
+    houseNumber: z.string().min(1, { message: 'House number is required' }),
+    apartmentNumber: z.string().optional(),
+    postalCode: z.string().min(1, { message: 'Postal code is required' }),
+    city: z.string().min(1, { message: 'City is required' }),
+  }),
 });
-
-// Update the ExtendedProfile type to use Supabase types
-type ExtendedProfile = Profile;
 
 type ProfileFormValues = z.infer<typeof profileSchema>;
 
 const Profile = () => {
   console.log("Profile page rendering");
   const navigate = useNavigate();
-  const { user, isAuthenticated, loading: authLoading, isAdmin } = useAuth();
+  const { user, isAuthenticated, loading: authLoading, isAdmin, refreshAdminStatus } = useAuth();
   const [profileLoading, setProfileLoading] = useState(true);
   const [profileError, setProfileError] = useState<string | null>(null);
-  const [profile, setProfile] = useState<ExtendedProfile | null>(null);
+  const [profile, setProfile] = useState<any | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [isPromotingToAdmin, setIsPromotingToAdmin] = useState(false);
   const [adminExists, setAdminExists] = useState(true); // Default to true to hide the admin section until we confirm
+  const [selectedCountryCode, setSelectedCountryCode] = useState<CountryCode>(countryCodes[0]);
 
   // Form
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
       full_name: '',
-      phone: '',
-      address: '',
+      country_code: '+1',
+      phone_number: '',
+      address: {
+        country: '',
+        street: '',
+        houseNumber: '',
+        apartmentNumber: '',
+        postalCode: '',
+        city: '',
+      }
     },
   });
 
@@ -137,10 +195,51 @@ const Profile = () => {
       if (profileData) {
         console.log("Profile data retrieved:", profileData);
         setProfile(profileData);
+
+        // Parse address if it exists
+        let addressObj: StructuredAddress = {
+          country: '',
+          street: '',
+          houseNumber: '',
+          apartmentNumber: '',
+          postalCode: '',
+          city: '',
+        };
+
+        // Try to parse existing address if it's in structured format
+        if (profileData.address && typeof profileData.address === 'object') {
+          addressObj = profileData.address as StructuredAddress;
+        }
+
+        // Find country code or use default
+        let countryCode = '+1';
+        if (profileData.country_code) {
+          countryCode = profileData.country_code;
+        }
+        
+        // Set country code in dropdown
+        const foundCode = countryCodes.find(c => c.code === countryCode);
+        if (foundCode) {
+          setSelectedCountryCode(foundCode);
+        }
+
+        // Split phone number if exists
+        let phoneNumber = '';
+        if (profileData.phone) {
+          // Try to remove the country code from the phone number if it exists
+          const phone = profileData.phone;
+          if (countryCode && phone.startsWith(countryCode)) {
+            phoneNumber = phone.substring(countryCode.length).trim();
+          } else {
+            phoneNumber = phone;
+          }
+        }
+
         form.reset({
           full_name: profileData.full_name || '',
-          phone: profileData.phone || '',
-          address: profileData.address || '',
+          country_code: countryCode,
+          phone_number: phoneNumber,
+          address: addressObj
         });
       } else {
         console.error("Failed to fetch profile data");
@@ -161,12 +260,18 @@ const Profile = () => {
     try {
       setIsSaving(true);
       
+      // Combine country code and phone number
+      const fullPhone = data.phone_number 
+        ? `${data.country_code}${data.phone_number}`
+        : null;
+      
       // Make sure to include the user id in the update data
       const updateData: ProfileUpdate = {
         id: user.id,
         full_name: data.full_name,
-        phone: data.phone,
+        phone: fullPhone,
         address: data.address,
+        country_code: data.country_code
       };
 
       const updatedProfile = await profileService.updateProfile(updateData);
@@ -205,6 +310,9 @@ const Profile = () => {
         
         // Update admin exists state to hide the section from other users
         setAdminExists(true);
+        
+        // Refresh admin status in auth context
+        await refreshAdminStatus();
         
         toast.success('You are now an admin! Please refresh the page or log out and log back in to see admin features.');
       }
@@ -482,49 +590,216 @@ const Profile = () => {
                             </p>
                           </div>
                           
-                          <FormField
-                            control={form.control}
-                            name="phone"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Phone Number</FormLabel>
-                                <FormControl>
-                                  <div className="relative">
-                                    <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-bloombook-400 h-4 w-4" />
-                                    <Input 
-                                      placeholder="Your phone number" 
-                                      className="pl-10" 
-                                      {...field} 
-                                      value={field.value || ''}
-                                    />
-                                  </div>
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
+                          {/* Phone Number with Country Code */}
+                          <div className="space-y-2">
+                            <FormLabel>Phone Number</FormLabel>
+                            <div className="flex space-x-2">
+                              <FormField
+                                control={form.control}
+                                name="country_code"
+                                render={({ field }) => (
+                                  <FormItem className="w-28">
+                                    <Select
+                                      value={field.value}
+                                      onValueChange={(value) => {
+                                        field.onChange(value);
+                                        const code = countryCodes.find(c => c.code === value);
+                                        if (code) setSelectedCountryCode(code);
+                                      }}
+                                    >
+                                      <FormControl>
+                                        <SelectTrigger>
+                                          <SelectValue placeholder="Code">
+                                            <span>{selectedCountryCode.flag} {selectedCountryCode.code}</span>
+                                          </SelectValue>
+                                        </SelectTrigger>
+                                      </FormControl>
+                                      <SelectContent className="max-h-[300px]">
+                                        {countryCodes.map((country) => (
+                                          <SelectItem key={country.code + country.name} value={country.code}>
+                                            <span className="flex items-center">
+                                              <span className="mr-2">{country.flag}</span>
+                                              <span>{country.code}</span>
+                                              <span className="ml-2 text-xs text-gray-500">{country.name}</span>
+                                            </span>
+                                          </SelectItem>
+                                        ))}
+                                      </SelectContent>
+                                    </Select>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+
+                              <FormField
+                                control={form.control}
+                                name="phone_number"
+                                render={({ field }) => (
+                                  <FormItem className="flex-1">
+                                    <FormControl>
+                                      <div className="relative">
+                                        <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-bloombook-400 h-4 w-4" />
+                                        <Input 
+                                          placeholder="Phone number" 
+                                          className="pl-10" 
+                                          {...field} 
+                                          value={field.value || ''}
+                                        />
+                                      </div>
+                                    </FormControl>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                            </div>
+                          </div>
                           
-                          <FormField
-                            control={form.control}
-                            name="address"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Address</FormLabel>
-                                <FormControl>
-                                  <div className="relative">
-                                    <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-bloombook-400 h-4 w-4" />
-                                    <Input 
-                                      placeholder="Your address" 
-                                      className="pl-10" 
-                                      {...field} 
-                                      value={field.value || ''}
-                                    />
-                                  </div>
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
+                          {/* Structured Address */}
+                          <div className="space-y-4">
+                            <FormLabel>Address</FormLabel>
+                            
+                            {/* Country */}
+                            <FormField
+                              control={form.control}
+                              name="address.country"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Country</FormLabel>
+                                  <Select
+                                    value={field.value}
+                                    onValueChange={field.onChange}
+                                  >
+                                    <FormControl>
+                                      <SelectTrigger>
+                                        <Globe className="mr-2 h-4 w-4 text-bloombook-400" />
+                                        <SelectValue placeholder="Select a country" />
+                                      </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                      {countries.map((country) => (
+                                        <SelectItem key={country} value={country}>
+                                          {country}
+                                        </SelectItem>
+                                      ))}
+                                    </SelectContent>
+                                  </Select>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            
+                            {/* Street */}
+                            <FormField
+                              control={form.control}
+                              name="address.street"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Street</FormLabel>
+                                  <FormControl>
+                                    <div className="relative">
+                                      <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-bloombook-400 h-4 w-4" />
+                                      <Input 
+                                        placeholder="Street name" 
+                                        className="pl-10" 
+                                        {...field} 
+                                      />
+                                    </div>
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                            
+                            {/* House number and Apartment in a row */}
+                            <div className="flex space-x-4">
+                              <FormField
+                                control={form.control}
+                                name="address.houseNumber"
+                                render={({ field }) => (
+                                  <FormItem className="flex-1">
+                                    <FormLabel>House Number</FormLabel>
+                                    <FormControl>
+                                      <div className="relative">
+                                        <Home className="absolute left-3 top-1/2 transform -translate-y-1/2 text-bloombook-400 h-4 w-4" />
+                                        <Input 
+                                          placeholder="House number" 
+                                          className="pl-10" 
+                                          {...field} 
+                                        />
+                                      </div>
+                                    </FormControl>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                              
+                              <FormField
+                                control={form.control}
+                                name="address.apartmentNumber"
+                                render={({ field }) => (
+                                  <FormItem className="flex-1">
+                                    <FormLabel>
+                                      Apartment Number
+                                      <span className="text-xs text-gray-500 ml-2">(Optional)</span>
+                                    </FormLabel>
+                                    <FormControl>
+                                      <div className="relative">
+                                        <Building className="absolute left-3 top-1/2 transform -translate-y-1/2 text-bloombook-400 h-4 w-4" />
+                                        <Input 
+                                          placeholder="Apt., suite, etc." 
+                                          className="pl-10" 
+                                          {...field} 
+                                          value={field.value || ''}
+                                        />
+                                      </div>
+                                    </FormControl>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                            </div>
+                            
+                            {/* Postal code and City in a row */}
+                            <div className="flex space-x-4">
+                              <FormField
+                                control={form.control}
+                                name="address.postalCode"
+                                render={({ field }) => (
+                                  <FormItem className="flex-1">
+                                    <FormLabel>Postal Code</FormLabel>
+                                    <FormControl>
+                                      <Input 
+                                        placeholder="Postal/ZIP code" 
+                                        {...field} 
+                                      />
+                                    </FormControl>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                              
+                              <FormField
+                                control={form.control}
+                                name="address.city"
+                                render={({ field }) => (
+                                  <FormItem className="flex-1">
+                                    <FormLabel>City</FormLabel>
+                                    <FormControl>
+                                      <div className="relative">
+                                        <MapPinned className="absolute left-3 top-1/2 transform -translate-y-1/2 text-bloombook-400 h-4 w-4" />
+                                        <Input 
+                                          placeholder="City/Town" 
+                                          className="pl-10" 
+                                          {...field} 
+                                        />
+                                      </div>
+                                    </FormControl>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                            </div>
+                          </div>
                           
                           <Button 
                             type="submit" 

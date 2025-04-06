@@ -1,13 +1,11 @@
-
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import type { Database } from '@/integrations/supabase/types';
 import type { Profile, ExtendedProfile } from '@/types/profile';
-import { useCart } from './CartContext'; // Import useCart to access the cart clearing functionality
+import { useCart } from './CartContext';
 
-// Types
 interface AuthContextType {
   user: User | null;
   session: Session | null;
@@ -20,17 +18,14 @@ interface AuthContextType {
   refreshAdminStatus: () => Promise<void>;
 }
 
-// Create the context
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Provider component
-export const AuthProvider = ({ children }: { children: ReactNode }) => {
+const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
   
-  // Function to check and update admin status
   const refreshAdminStatus = async () => {
     if (!user?.id) return;
     
@@ -51,21 +46,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
   
-  // Check auth status and set up listener on mount
   useEffect(() => {
     console.log("Setting up auth state change listener");
     
-    // Set up auth state change listener first
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, newSession) => {
         console.log("Auth state changed:", event, newSession?.user?.email);
         
-        // Update state based on session
         setSession(newSession);
         setUser(newSession?.user ?? null);
         
-        // Don't check profile inside the listener to avoid potential deadlock
-        // Instead, we'll use a setTimeout to defer this operation
         if (newSession?.user) {
           setTimeout(async () => {
             try {
@@ -94,7 +84,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
     );
 
-    // Check for existing session
     supabase.auth.getSession().then(({ data: { session: existingSession } }) => {
       console.log("Existing session check:", existingSession?.user?.email);
       
@@ -102,7 +91,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setUser(existingSession?.user ?? null);
       
       if (existingSession?.user) {
-        // Check if user is admin
         supabase
           .from('profiles')
           .select()
@@ -129,7 +117,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
   }, []);
 
-  // Login function
   const login = async (email: string, password: string) => {
     try {
       console.log("Attempting login for:", email);
@@ -154,7 +141,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  // Sign up function
   const signUp = async (email: string, password: string, name: string) => {
     try {
       console.log("Attempting signup for:", email);
@@ -186,31 +172,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  // Logout function
   const logout = async () => {
     try {
       console.log("Attempting to log out");
       setLoading(true);
       
-      // If a user is logged in, clear their cart in localStorage
       if (user?.id) {
         localStorage.removeItem(`cart_${user.id}`);
-        // Also clear guest cart to prevent showing it after logout
         localStorage.removeItem('cart_guest');
       }
       
-      // Clear the auth state first
       setUser(null);
       setSession(null);
       setIsAdmin(false);
       
-      // Sign out from Supabase
       await supabase.auth.signOut();
       
       console.log("Logout successful");
       toast.success('Signed out successfully');
       
-      // Redirect to home page
       window.location.href = '/';
     } catch (error: any) {
       console.error("Error during logout:", error);
@@ -235,7 +215,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
-// Custom hook to use the auth context
 export const useAuth = () => {
   const context = useContext(AuthContext);
   
