@@ -1,4 +1,3 @@
-
 import { supabase } from '../integrations/supabase/client';
 import { toast } from 'sonner';
 import type { Profile, ProfileUpdate, ExtendedProfile, StructuredAddress } from '@/types/profile';
@@ -224,6 +223,8 @@ export const profileService = {
   
   async checkIfAdminExists(): Promise<boolean> {
     try {
+      console.log("Checking if any admin user exists...");
+      
       const { data, error, count } = await supabase
         .from('profiles')
         .select('*', { count: 'exact' })
@@ -232,14 +233,17 @@ export const profileService = {
         
       if (error) {
         console.error('Error checking if admin exists:', error);
-        return false;
+        return true; // Default to true on error to prevent unnecessary admin promotion
       }
+      
+      // Log the result for debugging
+      console.log(`Admin check result: found ${count} admins, returning ${(count ?? 0) > 0}`);
       
       // If at least one admin is found, return true
       return (count ?? 0) > 0;
     } catch (error) {
       console.error('Unexpected error in checkIfAdminExists:', error);
-      return false;
+      return true; // Default to true on error to prevent unnecessary admin promotion
     }
   }
 };

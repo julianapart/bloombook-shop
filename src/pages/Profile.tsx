@@ -368,8 +368,8 @@ const Profile = () => {
   const checkAdminExists = async () => {
     try {
       const exists = await profileService.checkIfAdminExists();
+      console.log("Admin exists check result:", exists);
       setAdminExists(exists);
-      console.log("Admin exists:", exists);
     } catch (error) {
       console.error("Error checking if admin exists:", error);
       setAdminExists(true);
